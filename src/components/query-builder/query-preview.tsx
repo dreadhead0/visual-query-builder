@@ -7,6 +7,7 @@ import {
     selectActiveSchema,
     selectQueryTree,
     useQueryBuilderStore,
+    validateQueryTree,
 } from "@/features/query-builder";
 import { Button } from "@/components/ui/button";
 
@@ -14,6 +15,8 @@ export function QueryPreview() {
     const activeSchema = useQueryBuilderStore(selectActiveSchema);
     const queryTree = useQueryBuilderStore(selectQueryTree);
     const preview = formatMongoQueryPreview(queryTree, activeSchema);
+
+    const validation = validateQueryTree(queryTree, activeSchema);
 
     async function handleCopyPreview() {
         await navigator.clipboard.writeText(preview);
@@ -27,6 +30,13 @@ export function QueryPreview() {
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">
                         Mongo-style query generated from the visual query tree.
                     </p>
+
+                    {!validation.isValid && (
+                        <p className="mt-2 rounded-md border border-border bg-muted px-3 py-2 text-sm leading-6 text-muted-foreground">
+                            Preview is shown for debugging, but this query must be fixed before
+                            execution.
+                        </p>
+                    )}
                 </div>
 
                 <Button type="button" variant="outline" size="sm" onClick={handleCopyPreview}>
