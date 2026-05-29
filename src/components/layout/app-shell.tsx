@@ -1,21 +1,26 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    DATA_SCHEMAS,
-    DEFAULT_SCHEMA_ID,
     countGroups,
     countRules,
-    createInitialQueryTree,
-    getSchemaById,
     getTreeDepth,
+    selectActiveSchema,
+    selectQueryTree,
+    useQueryBuilderStore,
 } from "@/features/query-builder";
 
 export function AppShell() {
-    const activeSchema = getSchemaById(DEFAULT_SCHEMA_ID) ?? DATA_SCHEMAS[0];
-    const initialQueryTree = createInitialQueryTree(activeSchema);
-    const totalRules = countRules(initialQueryTree);
-    const totalGroups = countGroups(initialQueryTree);
-    const treeDepth = getTreeDepth(initialQueryTree);
+    const activeSchema = useQueryBuilderStore(selectActiveSchema);
+    const queryTree = useQueryBuilderStore(selectQueryTree);
+    const addRule = useQueryBuilderStore((state) => state.addRule);
+    const addGroup = useQueryBuilderStore((state) => state.addGroup);
+    const resetQuery = useQueryBuilderStore((state) => state.resetQuery);
+
+    const totalRules = countRules(queryTree);
+    const totalGroups = countGroups(queryTree);
+    const treeDepth = getTreeDepth(queryTree);
 
     return (
         <main className="min-h-screen bg-background text-foreground">
@@ -40,8 +45,15 @@ export function AppShell() {
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                        <Button variant="outline">Import JSON</Button>
-                        <Button variant="outline">Save Preset</Button>
+                        <Button variant="outline" onClick={() => addRule(queryTree.id)}>
+                            Add Rule
+                        </Button>
+                        <Button variant="outline" onClick={() => addGroup(queryTree.id)}>
+                            Add Group
+                        </Button>
+                        <Button variant="outline" onClick={resetQuery}>
+                            Reset
+                        </Button>
                         <Button>Run Query</Button>
                     </div>
                 </header>
@@ -72,8 +84,9 @@ export function AppShell() {
                         <p className="text-sm font-medium">Query Builder Canvas</p>
 
                         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                            The initial query tree starts with {totalGroups} group and{" "}
-                            {totalRules} rule. Current tree depth: {treeDepth}.
+                            The current query tree has {totalGroups} group
+                            {totalGroups === 1 ? "" : "s"} and {totalRules} rule
+                            {totalRules === 1 ? "" : "s"}. Current tree depth: {treeDepth}.
                         </p>
                     </section>
 
