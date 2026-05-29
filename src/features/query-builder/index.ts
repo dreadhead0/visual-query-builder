@@ -5,3 +5,4 @@ export * from "./node-factory";
 export * from "./tree-utils";
 export * from "./store-utils";
 export * from "./store";
+export * from "./query-generator";

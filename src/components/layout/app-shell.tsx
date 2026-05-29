@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { QueryBuilder } from "@/components/query-builder";
+import { QueryBuilder, QueryPreview } from "@/components/query-builder";
 import {
     selectActiveSchema,
     useQueryBuilderStore,
@@ -71,12 +71,7 @@ export function AppShell() {
                     </section>
 
                     <aside className="rounded-lg border border-border bg-card p-4">
-                        <p className="text-sm font-medium">Live Query Preview</p>
-
-                        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                            Generated Mongo-style query output and validation errors will live
-                            here.
-                        </p>
+                        <QueryPreview />
                     </aside>
                 </div>
 
