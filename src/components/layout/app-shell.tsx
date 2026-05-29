@@ -2,25 +2,15 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { QueryBuilder } from "@/components/query-builder";
 import {
-    countGroups,
-    countRules,
-    getTreeDepth,
     selectActiveSchema,
-    selectQueryTree,
     useQueryBuilderStore,
 } from "@/features/query-builder";
 
 export function AppShell() {
     const activeSchema = useQueryBuilderStore(selectActiveSchema);
-    const queryTree = useQueryBuilderStore(selectQueryTree);
-    const addRule = useQueryBuilderStore((state) => state.addRule);
-    const addGroup = useQueryBuilderStore((state) => state.addGroup);
     const resetQuery = useQueryBuilderStore((state) => state.resetQuery);
-
-    const totalRules = countRules(queryTree);
-    const totalGroups = countGroups(queryTree);
-    const treeDepth = getTreeDepth(queryTree);
 
     return (
         <main className="min-h-screen bg-background text-foreground">
@@ -45,12 +35,8 @@ export function AppShell() {
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                        <Button variant="outline" onClick={() => addRule(queryTree.id)}>
-                            Add Rule
-                        </Button>
-                        <Button variant="outline" onClick={() => addGroup(queryTree.id)}>
-                            Add Group
-                        </Button>
+                        <Button variant="outline">Import JSON</Button>
+                        <Button variant="outline">Save Preset</Button>
                         <Button variant="outline" onClick={resetQuery}>
                             Reset
                         </Button>
@@ -81,13 +67,7 @@ export function AppShell() {
                     </aside>
 
                     <section className="rounded-lg border border-border bg-card p-4">
-                        <p className="text-sm font-medium">Query Builder Canvas</p>
-
-                        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                            The current query tree has {totalGroups} group
-                            {totalGroups === 1 ? "" : "s"} and {totalRules} rule
-                            {totalRules === 1 ? "" : "s"}. Current tree depth: {treeDepth}.
-                        </p>
+                        <QueryBuilder />
                     </section>
 
                     <aside className="rounded-lg border border-border bg-card p-4">
