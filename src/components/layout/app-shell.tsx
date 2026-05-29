@@ -2,15 +2,23 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { QueryBuilder, QueryPreview } from "@/components/query-builder";
+import {
+    QueryBuilder,
+    QueryPreview,
+    ValidationPanel,
+} from "@/components/query-builder";
 import {
     selectActiveSchema,
+    selectQueryTree,
     useQueryBuilderStore,
+    validateQueryTree,
 } from "@/features/query-builder";
 
 export function AppShell() {
     const activeSchema = useQueryBuilderStore(selectActiveSchema);
+    const queryTree = useQueryBuilderStore(selectQueryTree);
     const resetQuery = useQueryBuilderStore((state) => state.resetQuery);
+    const validation = validateQueryTree(queryTree, activeSchema);
 
     return (
         <main className="min-h-screen bg-background text-foreground">
@@ -40,7 +48,7 @@ export function AppShell() {
                         <Button variant="outline" onClick={resetQuery}>
                             Reset
                         </Button>
-                        <Button>Run Query</Button>
+                        <Button disabled={!validation.isValid}>Run Query</Button>
                     </div>
                 </header>
 
@@ -70,8 +78,9 @@ export function AppShell() {
                         <QueryBuilder />
                     </section>
 
-                    <aside className="rounded-lg border border-border bg-card p-4">
+                    <aside className="space-y-4 rounded-lg border border-border bg-card p-4">
                         <QueryPreview />
+                        <ValidationPanel />
                     </aside>
                 </div>
 
