@@ -63,3 +63,18 @@ export type GroupNode = {
 export type QueryNode = RuleNode | GroupNode;
 
 export type QueryTree = GroupNode;
+
+export type SavedQueryPreset = {
+  id: string;
+  name: string;
+  schemaId: string;
+  queryTree: QueryTree;
+  createdAt: string;
+};
+
+export type QueryHistoryEntry = {
+  id: string;
+  schemaId: string;
+  queryTree: QueryTree;
+  executedAt: string;
+};

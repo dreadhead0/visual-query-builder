@@ -9,3 +9,4 @@ export * from "./query-generator";
 export * from "./query-validator";
 export * from "./mock-data";
 export * from "./query-executor";
+export * from "./storage";
