@@ -1,63 +1,72 @@
 # Visual Query Builder
 
-A Stage 8 finalist frontend project built with Next.js, TypeScript, and Tailwind CSS.
+A highly interactive visual query builder built with Next.js App Router and TypeScript.
 
-The application will allow users to visually build complex database/API queries using dynamic rules, nested condition groups, schema-driven inputs, live query previews, validation, and simulated query execution.
+Users can visually construct database/API-style filters using schema-driven fields, operators, nested condition groups, live Mongo-style query preview, validation, mock execution, query history, saved presets, and JSON import/export.
 
-## Project Goal
+## Live URL
 
-The goal is to build a highly interactive visual query builder that lets users create advanced filters without manually writing raw query syntax.
+Production deployment URL: https://visual-query-builder-2tr8.vercel.app/
 
-Example query logic:
+## Current Features
 
-```txt
-(age > 18 AND country = "Nigeria")
-OR
-(status = "active" AND purchases > 10)
-Core Features Planned
-Dynamic query rule builder
-Nested condition groups with AND/OR logic
-Recursive group rendering
-Schema-driven fields, operators, and inputs
-Live Mongo-style query preview
-Query execution simulator with mock datasets
-Query validation engine
-Drag-and-drop rule/group reordering
-Keyboard shortcuts
-Collapsible groups
-Query history
-Saved query presets
-Export/import query JSON
-Dark/light mode
-Animated transitions
-Unit and integration tests
-Tech Stack
-Next.js App Router
-TypeScript
-Tailwind CSS
-shadcn/ui
-Zustand
-DnD Kit
-Vitest and React Testing Library
-Engineering Focus
+- Next.js App Router
+- TypeScript
+- Tailwind CSS
+- Shadcn/UI components
+- Zustand state management
+- Schema-driven query builder
+- Dynamic field/operator/value controls
+- Recursive nested condition groups
+- Collapsible groups
+- Live Mongo-style query preview
+- Query validation engine
+- Mock query execution simulator
+- Result count display
+- Loading and empty states
+- Sorting and pagination
+- Data source/schema switching
+- Query history
+- Saved query presets
+- Export/import query JSON with validation
+- GitHub CI build checks
+- Vercel production deployment and preview deployments
 
-This project prioritizes:
+## Available Schemas
 
-Clean frontend architecture
-Typed query models
-Recursive UI engineering
-Scalable state management
-Validation and safety
-Performance optimization
-Meaningful test coverage
-Proper Git and pull request workflow
-Current Status
+The app currently supports three mock schemas:
 
-PR 1 sets up the project foundation:
+- Users
+- Orders
+- Products
 
-Next.js App Router project
-TypeScript configuration
-Tailwind CSS styling
-shadcn/ui setup
-Base application shell
-Initial layout for schema, builder, preview, and results sections
+Each schema controls the available fields, operators, value inputs, preview output, validation behavior, and result table columns.
+
+## Development
+
+Install dependencies:
+
+```bash
+npm install
+
+## Start development server:
+
+npm run dev
+
+## Run production build:
+
+npm run build
+
+## Deployment
+
+This project is deployed with Vercel.
+
+Pushes to main trigger production deployments.
+Pull requests generate preview deployments.
+GitHub Actions runs CI build checks before merge.
+
+## Project Status
+
+This project is being built through feature branches and pull requests as required by the Stage 8 task.
+
+Deployment provider: Vercel.
