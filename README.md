@@ -6,7 +6,7 @@ Users can visually construct database/API-style filters using schema-driven fiel
 
 ## Live URL
 
-Production deployment: https://visual-query-builder-2tr8.vercel.app/
+Production deployment URL: https://visual-query-builder-2tr8.vercel.app/
 
 ## Current Features
 
