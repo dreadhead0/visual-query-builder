@@ -1,5 +1,6 @@
 import { createGroupNode, createRuleNode } from "./node-factory";
 import { getFieldByName } from "./schemas";
+import { arrayMove } from "@dnd-kit/sortable";
 import type {
     DataSchema,
     GroupNode,
@@ -21,6 +22,12 @@ type AddChildOptions = {
 };
 
 type MoveNodeOptions = {
+    activeId: string;
+    overId: string;
+};
+
+type ReorderChildrenOptions = {
+    parentGroupId: string;
     activeId: string;
     overId: string;
 };
@@ -103,6 +110,40 @@ export function removeNodeFromTree(
         children: node.children
             .filter((child) => child.id !== targetId)
             .map((child) => removeNodeFromTree(child, targetId)),
+    };
+}
+
+export function reorderChildrenInGroup(
+    node: QueryNode,
+    options: ReorderChildrenOptions,
+): QueryNode {
+    if (node.type === "rule") {
+        return node;
+    }
+
+    if (node.id === options.parentGroupId) {
+        const oldIndex = node.children.findIndex(
+            (child) => child.id === options.activeId,
+        );
+        const newIndex = node.children.findIndex(
+            (child) => child.id === options.overId,
+        );
+
+        if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) {
+            return node;
+        }
+
+        return {
+            ...node,
+            children: arrayMove(node.children, oldIndex, newIndex),
+        };
+    }
+
+    return {
+        ...node,
+        children: node.children.map((child) =>
+            reorderChildrenInGroup(child, options),
+        ),
     };
 }
 

@@ -17,6 +17,7 @@ import {
     createRuleForSchema,
     moveNodeInTree,
     removeNodeFromTree,
+    reorderChildrenInGroup,
     toggleGroupCollapsed,
     updateGroupCombinator,
     updateNodeInTree,
@@ -59,6 +60,12 @@ type QueryBuilderActions = {
     ) => void;
     toggleGroupCollapsed: (groupId: string) => void;
     moveNode: (activeId: string, overId: string) => void;
+
+    reorderChildren: (
+        parentGroupId: string,
+        activeId: string,
+        overId: string,
+    ) => void;
 
     hydrateStoredQueries: () => void;
     recordQueryExecution: () => void;
@@ -300,6 +307,16 @@ export const useQueryBuilderStore = create<QueryBuilderStore>((set, get) => ({
                 activeId,
                 overId,
             }),
+        }));
+    },
+
+    reorderChildren: (parentGroupId, activeId, overId) => {
+        set((state) => ({
+            queryTree: reorderChildrenInGroup(state.queryTree, {
+                parentGroupId,
+                activeId,
+                overId,
+            }) as GroupNode,
         }));
     },
 }));

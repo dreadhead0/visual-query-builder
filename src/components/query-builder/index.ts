@@ -10,3 +10,4 @@ export * from "./query-library";
 export * from "./query-json-actions";
 export * from "./keyboard-shortcuts-dialog";
 export * from "./use-keyboard-shortcuts";
+export * from "./sortable-query-node";

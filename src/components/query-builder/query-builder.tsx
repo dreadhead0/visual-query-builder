@@ -8,6 +8,19 @@ import {
     selectQueryTree,
     useQueryBuilderStore,
 } from "@/features/query-builder";
+
+import {
+    closestCenter,
+    DndContext,
+    KeyboardSensor,
+    PointerSensor,
+    type DragEndEvent,
+    useSensor,
+    useSensors,
+} from "@dnd-kit/core";
+import {
+    sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
 import { Badge } from "@/components/ui/badge";
 import { QueryGroup } from "./query-group";
 
@@ -30,9 +43,46 @@ export function QueryBuilder() {
         (state) => state.toggleGroupCollapsed,
     );
 
+    const reorderChildren = useQueryBuilderStore((state) => state.reorderChildren);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        }),
+    );
+
     const totalRules = countRules(queryTree);
     const totalGroups = countGroups(queryTree);
     const treeDepth = getTreeDepth(queryTree);
+
+    function handleDragEnd(event: DragEndEvent) {
+        const { active, over } = event;
+
+        if (!over || active.id === over.id) {
+            return;
+        }
+
+        const activeParentGroupId = active.data.current?.parentGroupId;
+        const overParentGroupId = over.data.current?.parentGroupId;
+
+        if (
+            typeof activeParentGroupId !== "string" ||
+            typeof overParentGroupId !== "string"
+        ) {
+            return;
+        }
+
+        if (activeParentGroupId !== overParentGroupId) {
+            return;
+        }
+
+        reorderChildren(
+            activeParentGroupId,
+            String(active.id),
+            String(over.id),
+        );
+    }
 
     return (
         <div className="space-y-4">
@@ -51,19 +101,25 @@ export function QueryBuilder() {
                 </div>
             </div>
 
-            <QueryGroup
-                group={queryTree}
-                schema={activeSchema}
-                isRoot
-                onAddRule={addRule}
-                onAddGroup={addGroup}
-                onRemoveNode={removeNode}
-                onRuleFieldChange={updateRuleField}
-                onRuleOperatorChange={updateRuleOperator}
-                onRuleValueChange={updateRuleValue}
-                onGroupCombinatorChange={updateGroupCombinator}
-                onToggleCollapsed={toggleGroupCollapsed}
-            />
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+            >
+                <QueryGroup
+                    group={queryTree}
+                    schema={activeSchema}
+                    isRoot
+                    onAddRule={addRule}
+                    onAddGroup={addGroup}
+                    onRemoveNode={removeNode}
+                    onRuleFieldChange={updateRuleField}
+                    onRuleOperatorChange={updateRuleOperator}
+                    onRuleValueChange={updateRuleValue}
+                    onGroupCombinatorChange={updateGroupCombinator}
+                    onToggleCollapsed={toggleGroupCollapsed}
+                />
+            </DndContext>
         </div>
     );
 }
