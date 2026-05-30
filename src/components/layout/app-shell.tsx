@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
     DataSourcePanel,
     QueryBuilder,
+    QueryJsonActions,
     QueryLibrary,
     QueryPreview,
     QueryResults,
@@ -103,9 +104,7 @@ export function AppShell() {
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                        <Button variant="outline">Import JSON</Button>
-
-                        <Button variant="outline">Save Preset</Button>
+                        <QueryJsonActions onImportSuccess={resetExecutionState} />
 
                         <Button variant="outline" onClick={handleResetQuery}>
                             Reset
