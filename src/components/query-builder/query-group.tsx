@@ -1,6 +1,9 @@
 "use client";
 
 import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+
+import { SortableQueryNode } from "./sortable-query-node";
 
 import type {
     DataSchema,
@@ -149,38 +152,45 @@ export function QueryGroup({
                             This group is empty. Add a rule or nested group to continue.
                         </div>
                     ) : (
-                        group.children.map((child) => {
-                            if (child.type === "rule") {
-                                return (
-                                    <QueryRule
+                        <SortableContext
+                            items={group.children.map((child) => child.id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <div className="space-y-3">
+                                {group.children.map((child) => (
+                                    <SortableQueryNode
                                         key={child.id}
-                                        rule={child}
-                                        schema={schema}
-                                        onFieldChange={onRuleFieldChange}
-                                        onOperatorChange={onRuleOperatorChange}
-                                        onValueChange={onRuleValueChange}
-                                        onRemove={onRemoveNode}
-                                    />
-                                );
-                            }
-
-                            return (
-                                <QueryGroup
-                                    key={child.id}
-                                    group={child}
-                                    schema={schema}
-                                    depth={depth + 1}
-                                    onAddRule={onAddRule}
-                                    onAddGroup={onAddGroup}
-                                    onRemoveNode={onRemoveNode}
-                                    onRuleFieldChange={onRuleFieldChange}
-                                    onRuleOperatorChange={onRuleOperatorChange}
-                                    onRuleValueChange={onRuleValueChange}
-                                    onGroupCombinatorChange={onGroupCombinatorChange}
-                                    onToggleCollapsed={onToggleCollapsed}
-                                />
-                            );
-                        })
+                                        id={child.id}
+                                        parentGroupId={group.id}
+                                    >
+                                        {child.type === "rule" ? (
+                                            <QueryRule
+                                                rule={child}
+                                                schema={schema}
+                                                onFieldChange={onRuleFieldChange}
+                                                onOperatorChange={onRuleOperatorChange}
+                                                onValueChange={onRuleValueChange}
+                                                onRemove={onRemoveNode}
+                                            />
+                                        ) : (
+                                            <QueryGroup
+                                                group={child}
+                                                schema={schema}
+                                                depth={depth + 1}
+                                                onAddRule={onAddRule}
+                                                onAddGroup={onAddGroup}
+                                                onRemoveNode={onRemoveNode}
+                                                onRuleFieldChange={onRuleFieldChange}
+                                                onRuleOperatorChange={onRuleOperatorChange}
+                                                onRuleValueChange={onRuleValueChange}
+                                                onGroupCombinatorChange={onGroupCombinatorChange}
+                                                onToggleCollapsed={onToggleCollapsed}
+                                            />
+                                        )}
+                                    </SortableQueryNode>
+                                ))}
+                            </div>
+                        </SortableContext>
                     )}
                 </div>
             )}
