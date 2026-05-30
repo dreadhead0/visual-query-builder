@@ -7,3 +7,4 @@ export * from "./validation-panel";
 export * from "./query-results";
 export * from "./data-source-panel";
 export * from "./query-library";
+export * from "./query-json-actions";
