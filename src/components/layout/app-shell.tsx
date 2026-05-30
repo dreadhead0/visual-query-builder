@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
     DataSourcePanel,
+    KeyboardShortcutsDialog,
     QueryBuilder,
     QueryJsonActions,
     QueryLibrary,
     QueryPreview,
     QueryResults,
+    useKeyboardShortcuts,
     ValidationPanel,
 } from "@/components/query-builder";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +27,7 @@ import {
 export function AppShell() {
     const [runId, setRunId] = useState(0);
     const [isRunning, setIsRunning] = useState(false);
+    const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
     const [executedQueryTree, setExecutedQueryTree] = useState<GroupNode | null>(
         null,
     );
@@ -33,6 +36,8 @@ export function AppShell() {
     const activeSchema = useQueryBuilderStore(selectActiveSchema);
     const queryTree = useQueryBuilderStore(selectQueryTree);
     const resetQuery = useQueryBuilderStore((state) => state.resetQuery);
+    const addRootRule = useQueryBuilderStore((state) => state.addRule);
+    const addRootGroup = useQueryBuilderStore((state) => state.addGroup);
     const hydrateStoredQueries = useQueryBuilderStore(
         (state) => state.hydrateStoredQueries,
     );
@@ -46,19 +51,19 @@ export function AppShell() {
         hydrateStoredQueries();
     }, [hydrateStoredQueries]);
 
-    function resetExecutionState() {
+    const resetExecutionState = useCallback(() => {
         setRunId(0);
         setIsRunning(false);
         setExecutedQueryTree(null);
         setExecutedSchema(null);
-    }
+    }, []);
 
-    function handleResetQuery() {
+    const handleResetQuery = useCallback(() => {
         resetQuery();
         resetExecutionState();
-    }
+    }, [resetExecutionState, resetQuery]);
 
-    function handleRunQuery() {
+    const handleRunQuery = useCallback(() => {
         if (!validation.isValid) {
             return;
         }
@@ -75,11 +80,36 @@ export function AppShell() {
             setRunId((current) => current + 1);
             setIsRunning(false);
         }, 450);
-    }
+    }, [
+        activeSchema,
+        queryTree,
+        recordQueryExecution,
+        validation.isValid,
+    ]);
 
-    function handleSchemaChange() {
+    const handleSchemaChange = useCallback(() => {
         resetExecutionState();
-    }
+    }, [resetExecutionState]);
+
+    const handleAddRootRule = useCallback(() => {
+        addRootRule(queryTree.id);
+    }, [addRootRule, queryTree.id]);
+
+    const handleAddRootGroup = useCallback(() => {
+        addRootGroup(queryTree.id);
+    }, [addRootGroup, queryTree.id]);
+
+    const handleOpenShortcuts = useCallback(() => {
+        setIsShortcutsOpen(true);
+    }, []);
+
+    useKeyboardShortcuts({
+        onRunQuery: handleRunQuery,
+        onResetQuery: handleResetQuery,
+        onAddRootRule: handleAddRootRule,
+        onAddRootGroup: handleAddRootGroup,
+        onOpenShortcuts: handleOpenShortcuts,
+    });
 
     return (
         <main className="min-h-screen bg-background text-foreground">
@@ -105,6 +135,10 @@ export function AppShell() {
 
                     <div className="flex flex-wrap gap-2">
                         <QueryJsonActions onImportSuccess={resetExecutionState} />
+
+                        <Button variant="outline" onClick={handleOpenShortcuts}>
+                            Shortcuts
+                        </Button>
 
                         <Button variant="outline" onClick={handleResetQuery}>
                             Reset
@@ -139,6 +173,10 @@ export function AppShell() {
                     isRunning={isRunning}
                     executedQueryTree={executedQueryTree}
                     executedSchema={executedSchema}
+                />
+                <KeyboardShortcutsDialog
+                    open={isShortcutsOpen}
+                    onOpenChange={setIsShortcutsOpen}
                 />
             </section>
         </main>
