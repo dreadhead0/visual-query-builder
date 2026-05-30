@@ -5,3 +5,4 @@ export * from "./query-value-input";
 export * from "./query-preview";
 export * from "./validation-panel";
 export * from "./query-results";
+export * from "./data-source-panel";

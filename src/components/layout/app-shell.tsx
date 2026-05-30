@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+    DataSourcePanel,
     QueryBuilder,
     QueryPreview,
     QueryResults,
@@ -50,6 +51,11 @@ export function AppShell() {
         }, 450);
     }
 
+    function handleSchemaChange() {
+        setRunId(0);
+        setIsRunning(false);
+    }
+
     return (
         <main className="min-h-screen bg-background text-foreground">
             <section className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8">
@@ -85,26 +91,7 @@ export function AppShell() {
                 </header>
 
                 <div className="grid flex-1 gap-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)_360px]">
-                    <aside className="rounded-lg border border-border bg-card p-4">
-                        <p className="text-sm font-medium">Data Source</p>
-
-                        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                            The active schema is{" "}
-                            <span className="font-medium">{activeSchema.label}</span>.
-                        </p>
-
-                        <div className="mt-4 space-y-2">
-                            {activeSchema.fields.map((field) => (
-                                <div
-                                    key={field.name}
-                                    className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm"
-                                >
-                                    <span>{field.label}</span>
-                                    <Badge variant="outline">{field.type}</Badge>
-                                </div>
-                            ))}
-                        </div>
-                    </aside>
+                    <DataSourcePanel onSchemaChange={handleSchemaChange} />
 
                     <section className="rounded-lg border border-border bg-card p-4">
                         <QueryBuilder />
