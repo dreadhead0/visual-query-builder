@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
     DataSourcePanel,
     QueryBuilder,
+    QueryLibrary,
     QueryPreview,
     QueryResults,
     ValidationPanel,
 } from "@/components/query-builder";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
     selectActiveSchema,
     selectQueryTree,
@@ -31,7 +32,30 @@ export function AppShell() {
     const activeSchema = useQueryBuilderStore(selectActiveSchema);
     const queryTree = useQueryBuilderStore(selectQueryTree);
     const resetQuery = useQueryBuilderStore((state) => state.resetQuery);
+    const hydrateStoredQueries = useQueryBuilderStore(
+        (state) => state.hydrateStoredQueries,
+    );
+    const recordQueryExecution = useQueryBuilderStore(
+        (state) => state.recordQueryExecution,
+    );
+
     const validation = validateQueryTree(queryTree, activeSchema);
+
+    useEffect(() => {
+        hydrateStoredQueries();
+    }, [hydrateStoredQueries]);
+
+    function resetExecutionState() {
+        setRunId(0);
+        setIsRunning(false);
+        setExecutedQueryTree(null);
+        setExecutedSchema(null);
+    }
+
+    function handleResetQuery() {
+        resetQuery();
+        resetExecutionState();
+    }
 
     function handleRunQuery() {
         if (!validation.isValid) {
@@ -46,14 +70,14 @@ export function AppShell() {
         window.setTimeout(() => {
             setExecutedQueryTree(querySnapshot);
             setExecutedSchema(schemaSnapshot);
+            recordQueryExecution();
             setRunId((current) => current + 1);
             setIsRunning(false);
         }, 450);
     }
 
     function handleSchemaChange() {
-        setRunId(0);
-        setIsRunning(false);
+        resetExecutionState();
     }
 
     return (
@@ -80,11 +104,17 @@ export function AppShell() {
 
                     <div className="flex flex-wrap gap-2">
                         <Button variant="outline">Import JSON</Button>
+
                         <Button variant="outline">Save Preset</Button>
-                        <Button variant="outline" onClick={resetQuery}>
+
+                        <Button variant="outline" onClick={handleResetQuery}>
                             Reset
                         </Button>
-                        <Button disabled={!validation.isValid || isRunning} onClick={handleRunQuery}>
+
+                        <Button
+                            disabled={!validation.isValid || isRunning}
+                            onClick={handleRunQuery}
+                        >
                             {isRunning ? "Running..." : "Run Query"}
                         </Button>
                     </div>
@@ -102,6 +132,8 @@ export function AppShell() {
                         <ValidationPanel />
                     </aside>
                 </div>
+
+                <QueryLibrary onLoadQuery={resetExecutionState} />
 
                 <QueryResults
                     runId={runId}

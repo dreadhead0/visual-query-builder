@@ -6,6 +6,12 @@ import {
     getSchemaById,
 } from "./schemas";
 import {
+    readQueryHistory,
+    readSavedPresets,
+    writeQueryHistory,
+    writeSavedPresets,
+} from "./storage";
+import {
     addChildToGroup,
     createNestedGroupForSchema,
     createRuleForSchema,
@@ -23,15 +29,19 @@ import type {
     DataSchema,
     GroupNode,
     LogicalOperator,
+    QueryHistoryEntry,
     QueryOperator,
+    QueryTree,
     QueryValue,
-    RuleNode,
+    SavedQueryPreset,
 } from "./types";
 
 type QueryBuilderState = {
     schemas: DataSchema[];
     activeSchemaId: string;
     queryTree: GroupNode;
+    queryHistory: QueryHistoryEntry[];
+    savedPresets: SavedQueryPreset[];
 };
 
 type QueryBuilderActions = {
@@ -49,6 +59,13 @@ type QueryBuilderActions = {
     ) => void;
     toggleGroupCollapsed: (groupId: string) => void;
     moveNode: (activeId: string, overId: string) => void;
+
+    hydrateStoredQueries: () => void;
+    recordQueryExecution: () => void;
+    saveCurrentQueryAsPreset: (name: string) => void;
+    loadQueryTree: (schemaId: string, queryTree: QueryTree) => void;
+    deleteSavedPreset: (presetId: string) => void;
+    clearQueryHistory: () => void;
 };
 
 type QueryBuilderStore = QueryBuilderState & QueryBuilderActions;
@@ -63,6 +80,89 @@ export const useQueryBuilderStore = create<QueryBuilderStore>((set, get) => ({
     schemas: DATA_SCHEMAS,
     activeSchemaId: initialSchema.id,
     queryTree: createInitialQueryTree(initialSchema),
+    queryHistory: [],
+    savedPresets: [],
+
+    hydrateStoredQueries: () => {
+        set({
+            queryHistory: readQueryHistory(),
+            savedPresets: readSavedPresets(),
+        });
+    },
+
+    recordQueryExecution: () => {
+        const state = get();
+
+        const nextEntry: QueryHistoryEntry = {
+            id: `history_${crypto.randomUUID()}`,
+            schemaId: state.activeSchemaId,
+            queryTree: state.queryTree,
+            executedAt: new Date().toISOString(),
+        };
+
+        const nextHistory = [nextEntry, ...state.queryHistory].slice(0, 10);
+
+        writeQueryHistory(nextHistory);
+
+        set({
+            queryHistory: nextHistory,
+        });
+    },
+
+    saveCurrentQueryAsPreset: (name) => {
+        const trimmedName = name.trim();
+
+        if (!trimmedName) {
+            return;
+        }
+
+        const state = get();
+
+        const nextPreset: SavedQueryPreset = {
+            id: `preset_${crypto.randomUUID()}`,
+            name: trimmedName,
+            schemaId: state.activeSchemaId,
+            queryTree: state.queryTree,
+            createdAt: new Date().toISOString(),
+        };
+
+        const nextPresets = [nextPreset, ...state.savedPresets];
+
+        writeSavedPresets(nextPresets);
+
+        set({
+            savedPresets: nextPresets,
+        });
+    },
+
+    loadQueryTree: (schemaId, queryTree) => {
+        const nextSchema = getActiveSchema(schemaId);
+
+        set({
+            activeSchemaId: nextSchema.id,
+            queryTree,
+        });
+    },
+
+    deleteSavedPreset: (presetId) => {
+        const nextPresets = get().savedPresets.filter(
+            (preset) => preset.id !== presetId,
+        );
+
+        writeSavedPresets(nextPresets);
+
+        set({
+            savedPresets: nextPresets,
+        });
+    },
+
+    clearQueryHistory: () => {
+        writeQueryHistory([]);
+
+        set({
+            queryHistory: [],
+        });
+    },
 
     setActiveSchema: (schemaId) => {
         const nextSchema = getActiveSchema(schemaId);
@@ -214,4 +314,12 @@ export function selectQueryTree(state: QueryBuilderStore) {
 
 export function selectSchemas(state: QueryBuilderStore) {
     return state.schemas;
+}
+
+export function selectQueryHistory(state: QueryBuilderStore) {
+    return state.queryHistory;
+}
+
+export function selectSavedPresets(state: QueryBuilderStore) {
+    return state.savedPresets;
 }
