@@ -69,4 +69,4 @@ GitHub Actions runs CI build checks before merge.
 
 This project is being built through feature branches and pull requests as required by the Stage 8 task.
 
-Deployment provider: Vercel.
+Deployment provider: Vercel.com.
