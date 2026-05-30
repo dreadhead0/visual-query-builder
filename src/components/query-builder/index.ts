@@ -8,3 +8,5 @@ export * from "./query-results";
 export * from "./data-source-panel";
 export * from "./query-library";
 export * from "./query-json-actions";
+export * from "./keyboard-shortcuts-dialog";
+export * from "./use-keyboard-shortcuts";
