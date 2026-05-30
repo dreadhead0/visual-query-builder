@@ -7,3 +7,5 @@ export * from "./store-utils";
 export * from "./store";
 export * from "./query-generator";
 export * from "./query-validator";
+export * from "./mock-data";
+export * from "./query-executor";

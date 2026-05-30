@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     QueryBuilder,
     QueryPreview,
+    QueryResults,
     ValidationPanel,
 } from "@/components/query-builder";
 import {
@@ -12,13 +15,40 @@ import {
     selectQueryTree,
     useQueryBuilderStore,
     validateQueryTree,
+    type DataSchema,
+    type GroupNode,
 } from "@/features/query-builder";
 
 export function AppShell() {
+    const [runId, setRunId] = useState(0);
+    const [isRunning, setIsRunning] = useState(false);
+    const [executedQueryTree, setExecutedQueryTree] = useState<GroupNode | null>(
+        null,
+    );
+    const [executedSchema, setExecutedSchema] = useState<DataSchema | null>(null);
+
     const activeSchema = useQueryBuilderStore(selectActiveSchema);
     const queryTree = useQueryBuilderStore(selectQueryTree);
     const resetQuery = useQueryBuilderStore((state) => state.resetQuery);
     const validation = validateQueryTree(queryTree, activeSchema);
+
+    function handleRunQuery() {
+        if (!validation.isValid) {
+            return;
+        }
+
+        const querySnapshot = structuredClone(queryTree);
+        const schemaSnapshot = structuredClone(activeSchema);
+
+        setIsRunning(true);
+
+        window.setTimeout(() => {
+            setExecutedQueryTree(querySnapshot);
+            setExecutedSchema(schemaSnapshot);
+            setRunId((current) => current + 1);
+            setIsRunning(false);
+        }, 450);
+    }
 
     return (
         <main className="min-h-screen bg-background text-foreground">
@@ -48,7 +78,9 @@ export function AppShell() {
                         <Button variant="outline" onClick={resetQuery}>
                             Reset
                         </Button>
-                        <Button disabled={!validation.isValid}>Run Query</Button>
+                        <Button disabled={!validation.isValid || isRunning} onClick={handleRunQuery}>
+                            {isRunning ? "Running..." : "Run Query"}
+                        </Button>
                     </div>
                 </header>
 
@@ -84,14 +116,12 @@ export function AppShell() {
                     </aside>
                 </div>
 
-                <section className="rounded-lg border border-border bg-card p-4">
-                    <p className="text-sm font-medium">Execution Results</p>
-
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                        Mock query results, result count, loading state, empty state,
-                        pagination, and sorting will live here.
-                    </p>
-                </section>
+                <QueryResults
+                    runId={runId}
+                    isRunning={isRunning}
+                    executedQueryTree={executedQueryTree}
+                    executedSchema={executedSchema}
+                />
             </section>
         </main>
     );
