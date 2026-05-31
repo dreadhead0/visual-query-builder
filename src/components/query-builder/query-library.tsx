@@ -46,11 +46,11 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
     }
 
     return (
-        <section className="rounded-lg border border-border bg-card p-4">
+        <section className="rounded-2xl border border-border bg-card p-4">
             <div className="flex flex-col gap-1">
-                <p className="text-sm font-medium">Query Library</p>
+                <p className="text-sm font-semibold tracking-tight">Query Library</p>
                 <p className="text-sm leading-6 text-muted-foreground">
-                    Reuse recent query runs or save named presets for later.
+                    Load recent runs or save reusable query setups for demos and testing.
                 </p>
             </div>
 
@@ -76,15 +76,15 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
                     </div>
 
                     {queryHistory.length === 0 ? (
-                        <div className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
-                            Run a query to add it to history.
+                        <div className="rounded-xl border border-dashed border-border bg-background p-4 text-sm leading-6 text-muted-foreground">
+                            Run a valid query and it will appear here automatically.
                         </div>
                     ) : (
                         <div className="space-y-2">
                             {queryHistory.map((entry) => (
                                 <div
                                     key={entry.id}
-                                    className="flex flex-col gap-3 rounded-lg border border-border p-3 sm:flex-row sm:items-center sm:justify-between"
+                                    className="flex flex-col gap-3 rounded-xl border border-border bg-background p-3 sm:flex-row sm:items-center sm:justify-between"
                                 >
                                     <div className="min-w-0">
                                         <div className="flex items-center gap-2">
@@ -147,15 +147,15 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
                     </div>
 
                     {savedPresets.length === 0 ? (
-                        <div className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
-                            No saved presets yet. Save the current query to reuse it later.
+                        <div className="rounded-xl border border-dashed border-border bg-background p-4 text-sm leading-6 text-muted-foreground">
+                            No presets yet. Save a query once you have a useful setup.
                         </div>
                     ) : (
                         <div className="space-y-2">
                             {savedPresets.map((preset) => (
                                 <div
                                     key={preset.id}
-                                    className="flex flex-col gap-3 rounded-lg border border-border p-3 sm:flex-row sm:items-center sm:justify-between"
+                                    className="flex flex-col gap-3 rounded-xl border border-border bg-background p-3 sm:flex-row sm:items-center sm:justify-between"
                                 >
                                     <div className="min-w-0">
                                         <p className="truncate text-sm font-medium">{preset.name}</p>

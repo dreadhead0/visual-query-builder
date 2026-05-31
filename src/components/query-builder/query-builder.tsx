@@ -20,9 +20,7 @@ import {
     useSensor,
     useSensors,
 } from "@dnd-kit/core";
-import {
-    sortableKeyboardCoordinates,
-} from "@dnd-kit/sortable";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { Badge } from "@/components/ui/badge";
 import { QueryGroup } from "./query-group";
 
@@ -58,7 +56,6 @@ export function QueryBuilder() {
     const toggleGroupCollapsed = useQueryBuilderStore(
         (state) => state.toggleGroupCollapsed,
     );
-
     const reorderChildren = useQueryBuilderStore((state) => state.reorderChildren);
 
     const sensors = useSensors(
@@ -93,20 +90,19 @@ export function QueryBuilder() {
             return;
         }
 
-        reorderChildren(
-            activeParentGroupId,
-            String(active.id),
-            String(over.id),
-        );
+        reorderChildren(activeParentGroupId, String(active.id), String(over.id));
     }
 
     return (
         <div className="space-y-4">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div>
-                    <p className="text-sm font-medium">Query Builder Canvas</p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Build nested rules using field, operator, and value controls.
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                <div className="max-w-xl">
+                    <p className="text-sm font-semibold tracking-tight">
+                        Query Builder Canvas
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                        Create rules and nest groups. Each row becomes part of the generated
+                        query.
                     </p>
                 </div>
 
@@ -117,17 +113,34 @@ export function QueryBuilder() {
                 </div>
             </div>
 
-            {isDndReady ? (
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                >
+            <div className="rounded-2xl border border-border bg-background p-3">
+                {isDndReady ? (
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <QueryGroup
+                            group={queryTree}
+                            schema={activeSchema}
+                            isRoot
+                            isSortable
+                            onAddRule={addRule}
+                            onAddGroup={addGroup}
+                            onRemoveNode={removeNode}
+                            onRuleFieldChange={updateRuleField}
+                            onRuleOperatorChange={updateRuleOperator}
+                            onRuleValueChange={updateRuleValue}
+                            onGroupCombinatorChange={updateGroupCombinator}
+                            onToggleCollapsed={toggleGroupCollapsed}
+                        />
+                    </DndContext>
+                ) : (
                     <QueryGroup
                         group={queryTree}
                         schema={activeSchema}
                         isRoot
-                        isSortable
+                        isSortable={false}
                         onAddRule={addRule}
                         onAddGroup={addGroup}
                         onRemoveNode={removeNode}
@@ -137,23 +150,8 @@ export function QueryBuilder() {
                         onGroupCombinatorChange={updateGroupCombinator}
                         onToggleCollapsed={toggleGroupCollapsed}
                     />
-                </DndContext>
-            ) : (
-                <QueryGroup
-                    group={queryTree}
-                    schema={activeSchema}
-                    isRoot
-                    isSortable={false}
-                    onAddRule={addRule}
-                    onAddGroup={addGroup}
-                    onRemoveNode={removeNode}
-                    onRuleFieldChange={updateRuleField}
-                    onRuleOperatorChange={updateRuleOperator}
-                    onRuleValueChange={updateRuleValue}
-                    onGroupCombinatorChange={updateGroupCombinator}
-                    onToggleCollapsed={toggleGroupCollapsed}
-                />
-            )}
+                )}
+            </div>
         </div>
     );
 }

@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 import { SortableQueryNode } from "./sortable-query-node";
+import { QueryRule } from "./query-rule";
 
 import type {
     DataSchema,
@@ -22,7 +23,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { QueryRule } from "./query-rule";
 
 type QueryGroupProps = {
     group: GroupNode;
@@ -102,10 +102,10 @@ export function QueryGroup({
 
     return (
         <div
-            className="rounded-lg border border-border bg-card transition-colors duration-200"
+            className="rounded-2xl border border-border bg-card transition-colors duration-200"
             style={{ marginLeft: depth > 0 ? 16 : 0 }}
         >
-            <div className="flex flex-col gap-3 border-b border-border p-3 transition-colors duration-200 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-3 border-b border-border p-3 md:flex-row md:items-center md:justify-between">
                 <div className="flex flex-wrap items-center gap-2">
                     <Button
                         type="button"
@@ -142,7 +142,9 @@ export function QueryGroup({
                         </SelectContent>
                     </Select>
 
-                    <span className="text-sm text-muted-foreground">{childSummary}</span>
+                    <span className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground">
+                        {childSummary}
+                    </span>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
@@ -185,7 +187,7 @@ export function QueryGroup({
             {!group.collapsed && (
                 <div className="space-y-3 p-3 transition-all duration-200">
                     {group.children.length === 0 ? (
-                        <div className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
+                        <div className="rounded-xl border border-dashed border-border bg-background p-4 text-sm leading-6 text-muted-foreground">
                             This group is empty. Add a rule or nested group to continue.
                         </div>
                     ) : isSortable ? (
