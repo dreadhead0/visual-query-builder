@@ -134,6 +134,7 @@ export function QueryResults({
         return (
             <section className="liquid-panel rounded-[1.75rem] p-4">
                 <p className="text-sm font-semibold tracking-tight">Execution Results</p>
+
                 <div className="liquid-readable mt-3 rounded-2xl border-dashed p-6 text-sm text-muted-foreground">
                     Running query against mock dataset...
                 </div>
@@ -145,6 +146,7 @@ export function QueryResults({
         return (
             <section className="liquid-panel rounded-[1.75rem] p-4">
                 <p className="text-sm font-semibold tracking-tight">Execution Results</p>
+
                 <div className="liquid-readable mt-3 rounded-2xl border-dashed p-6 text-sm leading-6 text-muted-foreground">
                     Build a valid query, then run it to inspect matching mock records here.
                 </div>
@@ -159,6 +161,7 @@ export function QueryResults({
                     <p className="text-sm font-semibold tracking-tight">
                         Execution Results
                     </p>
+
                     <p className="mt-1 text-sm text-muted-foreground">
                         Showing records from the {executedSchema?.label} mock dataset.
                     </p>
@@ -205,71 +208,77 @@ export function QueryResults({
             ) : (
                 <>
                     <div className="liquid-readable mt-4 overflow-hidden rounded-2xl">
-                        <div className="overflow-x-auto">
-                            <table className="w-full min-w-[720px] text-left text-sm">
-                                <thead className="border-b border-border bg-muted/45">
+                        <div
+                            className="max-h-[320px] overflow-auto"
+                            onScroll={(event) =>
+                                setScrollTop(event.currentTarget.scrollTop)
+                            }
+                        >
+                            <table className="w-full min-w-[720px] table-fixed text-left text-sm">
+                                <colgroup>
+                                    {executedSchema?.fields.map((field) => (
+                                        <col key={field.name} />
+                                    ))}
+                                </colgroup>
+
+                                <thead className="sticky top-0 z-10 border-b border-border bg-background">
                                     <tr>
                                         {executedSchema?.fields.map((field) => (
                                             <th
                                                 key={field.name}
                                                 className="px-3 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
                                             >
-                                                {field.label}
+                                                <span className="block truncate">
+                                                    {field.label}
+                                                </span>
                                             </th>
                                         ))}
                                     </tr>
                                 </thead>
-                            </table>
 
-                            <div
-                                className="max-h-[320px] overflow-y-auto"
-                                onScroll={(event) =>
-                                    setScrollTop(event.currentTarget.scrollTop)
-                                }
-                            >
-                                <table className="w-full min-w-[720px] text-left text-sm">
-                                    <tbody>
-                                        {topSpacerHeight > 0 && (
-                                            <tr aria-hidden="true">
-                                                <td
-                                                    colSpan={executedSchema?.fields.length ?? 1}
-                                                    style={{ height: topSpacerHeight }}
-                                                />
-                                            </tr>
-                                        )}
+                                <tbody>
+                                    {topSpacerHeight > 0 && (
+                                        <tr aria-hidden="true">
+                                            <td
+                                                colSpan={executedSchema?.fields.length ?? 1}
+                                                style={{ height: topSpacerHeight }}
+                                            />
+                                        </tr>
+                                    )}
 
-                                        {virtualRecords.map((record, index) => {
-                                            const actualIndex = startIndex + index;
+                                    {virtualRecords.map((record, index) => {
+                                        const actualIndex = startIndex + index;
 
-                                            return (
-                                                <tr
-                                                    key={getRecordKey(record, actualIndex)}
-                                                    className="border-b border-border transition-colors last:border-b-0 hover:bg-muted/40"
-                                                    style={{ height: ROW_HEIGHT }}
-                                                >
-                                                    {executedSchema?.fields.map((field) => (
-                                                        <td
-                                                            key={field.name}
-                                                            className="px-3 py-3"
-                                                        >
+                                        return (
+                                            <tr
+                                                key={getRecordKey(record, actualIndex)}
+                                                className="border-b border-border transition-colors last:border-b-0 hover:bg-muted/40"
+                                                style={{ height: ROW_HEIGHT }}
+                                            >
+                                                {executedSchema?.fields.map((field) => (
+                                                    <td
+                                                        key={field.name}
+                                                        className="px-3 py-3 align-middle"
+                                                    >
+                                                        <span className="block truncate">
                                                             {formatCellValue(record[field.name])}
-                                                        </td>
-                                                    ))}
-                                                </tr>
-                                            );
-                                        })}
-
-                                        {bottomSpacerHeight > 0 && (
-                                            <tr aria-hidden="true">
-                                                <td
-                                                    colSpan={executedSchema?.fields.length ?? 1}
-                                                    style={{ height: bottomSpacerHeight }}
-                                                />
+                                                        </span>
+                                                    </td>
+                                                ))}
                                             </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        );
+                                    })}
+
+                                    {bottomSpacerHeight > 0 && (
+                                        <tr aria-hidden="true">
+                                            <td
+                                                colSpan={executedSchema?.fields.length ?? 1}
+                                                style={{ height: bottomSpacerHeight }}
+                                            />
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
