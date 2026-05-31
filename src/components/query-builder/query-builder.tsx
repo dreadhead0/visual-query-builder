@@ -94,15 +94,15 @@ export function QueryBuilder() {
     }
 
     return (
-        <div className="space-y-4">
+        <div className="flex min-h-0 min-w-0 flex-col space-y-4">
             <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                 <div className="max-w-xl">
                     <p className="text-sm font-semibold tracking-tight">
                         Query Builder Canvas
                     </p>
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                        Create rules and nest groups. Each row becomes part of the generated
-                        query.
+                        Create rules and nest groups. Deep groups stay compact so the
+                        builder remains usable.
                     </p>
                 </div>
 
@@ -113,18 +113,35 @@ export function QueryBuilder() {
                 </div>
             </div>
 
-            <div className="rounded-2xl border border-border bg-background p-3">
-                {isDndReady ? (
-                    <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
-                    >
+            <div className="liquid-surface min-w-0 overflow-hidden rounded-2xl p-3">
+                <div className="max-h-[68vh] min-w-0 overflow-y-auto overflow-x-hidden pr-1">
+                    {isDndReady ? (
+                        <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleDragEnd}
+                        >
+                            <QueryGroup
+                                group={queryTree}
+                                schema={activeSchema}
+                                isRoot
+                                isSortable
+                                onAddRule={addRule}
+                                onAddGroup={addGroup}
+                                onRemoveNode={removeNode}
+                                onRuleFieldChange={updateRuleField}
+                                onRuleOperatorChange={updateRuleOperator}
+                                onRuleValueChange={updateRuleValue}
+                                onGroupCombinatorChange={updateGroupCombinator}
+                                onToggleCollapsed={toggleGroupCollapsed}
+                            />
+                        </DndContext>
+                    ) : (
                         <QueryGroup
                             group={queryTree}
                             schema={activeSchema}
                             isRoot
-                            isSortable
+                            isSortable={false}
                             onAddRule={addRule}
                             onAddGroup={addGroup}
                             onRemoveNode={removeNode}
@@ -134,23 +151,8 @@ export function QueryBuilder() {
                             onGroupCombinatorChange={updateGroupCombinator}
                             onToggleCollapsed={toggleGroupCollapsed}
                         />
-                    </DndContext>
-                ) : (
-                    <QueryGroup
-                        group={queryTree}
-                        schema={activeSchema}
-                        isRoot
-                        isSortable={false}
-                        onAddRule={addRule}
-                        onAddGroup={addGroup}
-                        onRemoveNode={removeNode}
-                        onRuleFieldChange={updateRuleField}
-                        onRuleOperatorChange={updateRuleOperator}
-                        onRuleValueChange={updateRuleValue}
-                        onGroupCombinatorChange={updateGroupCombinator}
-                        onToggleCollapsed={toggleGroupCollapsed}
-                    />
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -21,6 +21,7 @@ import { QueryValueInput } from "./query-value-input";
 type QueryRuleProps = {
     rule: RuleNode;
     schema: DataSchema;
+    compact?: boolean;
     onFieldChange: (ruleId: string, fieldName: string) => void;
     onOperatorChange: (ruleId: string, operator: RuleNode["operator"]) => void;
     onValueChange: (ruleId: string, value: RuleNode["value"]) => void;
@@ -30,6 +31,7 @@ type QueryRuleProps = {
 export function QueryRule({
     rule,
     schema,
+    compact = false,
     onFieldChange,
     onOperatorChange,
     onValueChange,
@@ -39,14 +41,20 @@ export function QueryRule({
     const operators = getOperatorsForFieldType(selectedField.type);
 
     return (
-        <div className="rounded-xl border border-border bg-background p-3 transition-colors duration-200 hover:bg-muted/40">
-            <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)_auto]">
+        <div className="liquid-readable min-w-0 rounded-2xl p-3 transition-colors duration-200 hover:bg-muted/35">
+            <div
+                className={
+                    compact
+                        ? "grid min-w-0 gap-2"
+                        : "grid min-w-0 gap-3 xl:grid-cols-[minmax(120px,1fr)_minmax(120px,1fr)_minmax(160px,1.2fr)_auto]"
+                }
+            >
                 <Select
                     name={`${rule.id}-field`}
                     value={rule.field}
                     onValueChange={(fieldName) => onFieldChange(rule.id, fieldName)}
                 >
-                    <SelectTrigger data-testid="rule-field-trigger">
+                    <SelectTrigger data-testid="rule-field-trigger" className="min-w-0">
                         <SelectValue placeholder="Select field" />
                     </SelectTrigger>
 
@@ -66,7 +74,10 @@ export function QueryRule({
                         onOperatorChange(rule.id, operator as RuleNode["operator"])
                     }
                 >
-                    <SelectTrigger data-testid="rule-operator-trigger">
+                    <SelectTrigger
+                        data-testid="rule-operator-trigger"
+                        className="min-w-0"
+                    >
                         <SelectValue placeholder="Select operator" />
                     </SelectTrigger>
 
@@ -92,6 +103,7 @@ export function QueryRule({
                     variant="outline"
                     size="icon"
                     aria-label="Remove rule"
+                    className={compact ? "w-full" : ""}
                     onClick={() => onRemove(rule.id)}
                 >
                     <Trash2 className="h-4 w-4" />

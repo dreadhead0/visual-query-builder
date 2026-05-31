@@ -67,6 +67,7 @@ export function QueryGroup({
     onToggleCollapsed,
 }: QueryGroupProps) {
     const childSummary = getChildSummary(group.children);
+    const isDeepGroup = depth >= 3;
 
     function renderChild(child: QueryNode) {
         if (child.type === "rule") {
@@ -74,6 +75,7 @@ export function QueryGroup({
                 <QueryRule
                     rule={child}
                     schema={schema}
+                    compact={isDeepGroup}
                     onFieldChange={onRuleFieldChange}
                     onOperatorChange={onRuleOperatorChange}
                     onValueChange={onRuleValueChange}
@@ -102,11 +104,11 @@ export function QueryGroup({
 
     return (
         <div
-            className="rounded-2xl border border-border bg-card transition-colors duration-200"
-            style={{ marginLeft: depth > 0 ? 16 : 0 }}
+            className="liquid-surface min-w-0 rounded-2xl transition-colors duration-200"
+            data-depth={depth}
         >
-            <div className="flex flex-col gap-3 border-b border-border p-3 md:flex-row md:items-center md:justify-between">
-                <div className="flex flex-wrap items-center gap-2">
+            <div className="grid gap-3 border-b border-border p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
                     <Button
                         type="button"
                         variant="ghost"
@@ -125,6 +127,8 @@ export function QueryGroup({
                         {isRoot ? "Root group" : "Nested group"}
                     </Badge>
 
+                    <Badge variant="outline">Depth {depth + 1}</Badge>
+
                     <Select
                         name={`${group.id}-combinator`}
                         value={group.combinator}
@@ -132,7 +136,7 @@ export function QueryGroup({
                             onGroupCombinatorChange(group.id, value as LogicalOperator)
                         }
                     >
-                        <SelectTrigger className="w-[110px]">
+                        <SelectTrigger className="w-[104px]">
                             <SelectValue />
                         </SelectTrigger>
 
@@ -147,7 +151,7 @@ export function QueryGroup({
                     </span>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
                     <Button
                         type="button"
                         variant="outline"
@@ -175,6 +179,7 @@ export function QueryGroup({
                             type="button"
                             variant="outline"
                             size="sm"
+                            className="col-span-2 sm:col-span-1"
                             onClick={() => onRemoveNode(group.id)}
                         >
                             <Trash2 className="mr-2 h-4 w-4" />
@@ -185,10 +190,10 @@ export function QueryGroup({
             </div>
 
             {!group.collapsed && (
-                <div className="space-y-3 p-3 transition-all duration-200">
+                <div className={isDeepGroup ? "space-y-2 p-2" : "space-y-3 p-3"}>
                     {group.children.length === 0 ? (
-                        <div className="rounded-xl border border-dashed border-border bg-background p-4 text-sm leading-6 text-muted-foreground">
-                            This group is empty. Add a rule or nested group to continue.
+                        <div className="liquid-readable rounded-xl border-dashed p-4 text-sm leading-6 text-muted-foreground">
+                            This group is empty. Add at least one rule or nested group.
                         </div>
                     ) : isSortable ? (
                         <SortableContext

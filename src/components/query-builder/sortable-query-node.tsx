@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { GripVertical } from "lucide-react";
 import { CSS } from "@dnd-kit/utilities";
 import { useSortable } from "@dnd-kit/sortable";
@@ -9,7 +10,7 @@ import { Button } from "@/components/ui/button";
 type SortableQueryNodeProps = {
     id: string;
     parentGroupId: string;
-    children: React.ReactNode;
+    children: ReactNode;
 };
 
 export function SortableQueryNode({
@@ -43,18 +44,18 @@ export function SortableQueryNode({
             style={style}
             className={
                 isDragging
-                    ? "opacity-60 transition-opacity duration-150"
-                    : "transition-opacity duration-150"
+                    ? "min-w-0 opacity-60 transition-opacity duration-150"
+                    : "min-w-0 transition-opacity duration-150"
             }
         >
-            <div className="grid gap-2 sm:grid-cols-[auto_minmax(0,1fr)]">
+            <div className="grid min-w-0 gap-2 sm:grid-cols-[auto_minmax(0,1fr)]">
                 <Button
                     ref={setActivatorNodeRef}
                     type="button"
                     variant="outline"
                     size="icon"
                     aria-label="Drag to reorder"
-                    className="h-9 w-9 cursor-grab active:cursor-grabbing transition-colors"
+                    className="h-9 w-9 cursor-grab active:cursor-grabbing"
                     {...attributes}
                     {...listeners}
                 >
