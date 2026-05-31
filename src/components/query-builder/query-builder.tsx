@@ -526,7 +526,7 @@ export function QueryBuilder() {
     );
 
     const totalRules = countRules(queryTree);
-    const totalGroups = countGroups(queryTree);
+    const totalGroups = Math.max(0, countGroups(queryTree) - 1);
     const treeDepth = getTreeDepth(queryTree);
     const firstRuleId = findFirstRuleId(queryTree);
     const selectedCandidate = selectedNodeId
@@ -587,7 +587,9 @@ export function QueryBuilder() {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline">{totalGroups} groups</Badge>
+                    <Badge variant="outline">
+                        {totalGroups} nested group{totalGroups === 1 ? "" : "s"}
+                    </Badge>
                     <Badge variant="outline">{totalRules} rules</Badge>
                     <Badge variant="outline">Depth {treeDepth}</Badge>
                 </div>

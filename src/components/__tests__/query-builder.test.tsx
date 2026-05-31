@@ -51,7 +51,6 @@ describe("QueryBuilder", () => {
         });
 
         await user.click(addGroupButtons[0]);
-
-        expect(screen.getByText("2 groups")).toBeInTheDocument();
+        expect(screen.getByText(/1\s*nested group/i)).toBeInTheDocument();
     });
 });

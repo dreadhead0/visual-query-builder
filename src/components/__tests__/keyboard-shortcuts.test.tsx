@@ -43,10 +43,10 @@ describe("keyboard shortcuts", () => {
 
         render(<AppShell />);
 
-        expect(screen.getByText("1 groups")).toBeInTheDocument();
+        expect(screen.getByText(/0\s*nested groups/i)).toBeInTheDocument();
 
         await user.keyboard("{Control>}{Shift>}g{/Shift}{/Control}");
 
-        expect(screen.getByText("2 groups")).toBeInTheDocument();
+        expect(screen.getByText(/1\s*nested group/i)).toBeInTheDocument();
     });
 });
