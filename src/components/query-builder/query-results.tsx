@@ -85,6 +85,17 @@ export function QueryResults({
         safePage * PAGE_SIZE,
     );
 
+    function getRecordKey(record: MockRecord, index: number) {
+        const preferredKey =
+            record.id ??
+            record.orderId ??
+            record.email ??
+            record.title ??
+            record.name;
+
+        return preferredKey ? String(preferredKey) : `record-${index}`;
+    }
+
     function handleSortFieldChange(fieldName: string) {
         setSortField(fieldName);
         setPage(1);
@@ -173,8 +184,11 @@ export function QueryResults({
                             </thead>
 
                             <tbody>
-                                {paginatedRecords.map((record, index) => (
-                                    <tr key={index} className="border-b border-border last:border-b-0">
+                                    {paginatedRecords.map((record, index) => (
+                                        <tr
+                                            key={getRecordKey(record, index)}
+                                            className="border-b border-border last:border-b-0"
+                                        >
                                         {executedSchema?.fields.map((field) => (
                                             <td key={field.name} className="px-3 py-2">
                                                 {formatCellValue(record[field.name])}

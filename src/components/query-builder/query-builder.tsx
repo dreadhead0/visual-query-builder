@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 import {
     countGroups,
@@ -26,13 +26,21 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { QueryGroup } from "./query-group";
 
+function subscribe() {
+    return () => { };
+}
+
+function useIsMounted() {
+    return useSyncExternalStore(
+        subscribe,
+        () => true,
+        () => false,
+    );
+}
+
 export function QueryBuilder() {
+    const isDndReady = useIsMounted();
 
-    const [isDndReady, setIsDndReady] = useState(false);
-
-    useEffect(() => {
-        setIsDndReady(true);
-    }, []);
     const activeSchema = useQueryBuilderStore(selectActiveSchema);
     const queryTree = useQueryBuilderStore(selectQueryTree);
 

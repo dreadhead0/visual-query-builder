@@ -2,19 +2,27 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 import { Button } from "@/components/ui/button";
 
+function subscribe() {
+    return () => { };
+}
+
+function useIsMounted() {
+    return useSyncExternalStore(
+        subscribe,
+        () => true,
+        () => false,
+    );
+}
+
 export function ThemeToggle() {
-    const [mounted, setMounted] = useState(false);
+    const isMounted = useIsMounted();
     const { resolvedTheme, setTheme } = useTheme();
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    if (!mounted) {
+    if (!isMounted) {
         return (
             <Button type="button" variant="outline" disabled>
                 Theme

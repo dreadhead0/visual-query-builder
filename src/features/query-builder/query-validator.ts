@@ -98,6 +98,19 @@ function isInvalidNumberRange(value: QueryValue) {
     return from > to;
 }
 
+function isInvalidRegexPattern(value: QueryValue) {
+    if (typeof value !== "string" || value.trim() === "") {
+        return true;
+    }
+
+    try {
+        new RegExp(value);
+        return false;
+    } catch {
+        return true;
+    }
+}
+
 function isInvalidDateValue(value: QueryValue) {
     if (typeof value !== "string") {
         return true;
@@ -139,6 +152,18 @@ function validateValueForFieldType(
     if (isValueMissing(value, operator)) {
         issues.push(
             createValidationIssue(nodeId, "error", "This rule needs a value."),
+        );
+
+        return issues;
+    }
+
+    if (operator === "regex" && isInvalidRegexPattern(value)) {
+        issues.push(
+            createValidationIssue(
+                nodeId,
+                "error",
+                "Enter a valid regular expression pattern.",
+            ),
         );
 
         return issues;

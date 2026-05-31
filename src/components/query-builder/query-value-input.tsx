@@ -1,6 +1,10 @@
 "use client";
 
-import type { SchemaField, QueryOperator, QueryValue } from "@/features/query-builder";
+import type {
+    QueryOperator,
+    QueryValue,
+    SchemaField,
+} from "@/features/query-builder";
 import { Input } from "@/components/ui/input";
 import {
     Select,
@@ -11,6 +15,7 @@ import {
 } from "@/components/ui/select";
 
 type QueryValueInputProps = {
+    ruleId: string;
     field: SchemaField;
     operator: QueryOperator;
     value: QueryValue;
@@ -41,12 +46,19 @@ function getTextInputType(field: SchemaField) {
     return "text";
 }
 
+function createControlName(ruleId: string, fieldName: string, operator: string) {
+    return `${ruleId}-${fieldName}-${operator}`;
+}
+
 export function QueryValueInput({
+    ruleId,
     field,
     operator,
     value,
     onChange,
 }: QueryValueInputProps) {
+    const controlName = createControlName(ruleId, field.name, operator);
+
     if (operator === "isNull" || operator === "isNotNull") {
         return (
             <div className="rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
@@ -61,7 +73,7 @@ export function QueryValueInput({
         return (
             <div className="grid gap-2 sm:grid-cols-2">
                 <Input
-                    name={`${field.name}-${operator}-from`}
+                    name={`${controlName}-from`}
                     aria-label={`${field.label} from value`}
                     type={getTextInputType(field)}
                     value={String(rangeValue.from)}
@@ -75,7 +87,7 @@ export function QueryValueInput({
                 />
 
                 <Input
-                    name={`${field.name}-${operator}-to`}
+                    name={`${controlName}-to`}
                     aria-label={`${field.label} to value`}
                     type={getTextInputType(field)}
                     value={String(rangeValue.to)}
@@ -94,7 +106,7 @@ export function QueryValueInput({
     if (field.type === "boolean") {
         return (
             <Select
-                name={`${field.name}-${operator}`}
+                name={controlName}
                 value={String(value)}
                 onValueChange={(nextValue) => onChange(nextValue === "true")}
             >
@@ -112,11 +124,7 @@ export function QueryValueInput({
 
     if (field.type === "enum" && field.options) {
         return (
-            <Select
-                name={`${field.name}-${operator}`}
-                value={String(value)}
-                onValueChange={onChange}
-            >
+            <Select name={controlName} value={String(value)} onValueChange={onChange}>
                 <SelectTrigger>
                     <SelectValue placeholder="Select value" />
                 </SelectTrigger>
@@ -135,7 +143,7 @@ export function QueryValueInput({
     if (operator === "inArray") {
         return (
             <Input
-                name={`${field.name}-${operator}`}
+                name={controlName}
                 aria-label={`${field.label} values`}
                 value={Array.isArray(value) ? value.join(", ") : ""}
                 placeholder="Separate values with commas"
@@ -153,7 +161,7 @@ export function QueryValueInput({
 
     return (
         <Input
-            name={`${field.name}-${operator}`}
+            name={controlName}
             aria-label={`${field.label} value`}
             type={getTextInputType(field)}
             value={String(value ?? "")}
