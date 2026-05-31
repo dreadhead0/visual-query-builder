@@ -30,12 +30,15 @@ export function DataSourcePanel({ onSchemaChange }: DataSourcePanelProps) {
     }
 
     return (
-        <aside className="rounded-lg border border-border bg-card p-4">
-            <div>
-                <p className="text-sm font-medium">Data Source</p>
+        <aside className="rounded-2xl border border-border bg-card p-4">
+            <div className="space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold tracking-tight">Data Source</p>
+                    <Badge variant="outline">{schemas.length} schemas</Badge>
+                </div>
 
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    Choose the schema the query builder should use.
+                <p className="text-sm leading-6 text-muted-foreground">
+                    Start here. Pick the dataset your query should filter.
                 </p>
             </div>
 
@@ -59,21 +62,33 @@ export function DataSourcePanel({ onSchemaChange }: DataSourcePanelProps) {
                 </Select>
             </div>
 
-            <div className="mt-4 rounded-md border border-border bg-background p-3">
-                <p className="text-sm font-medium">{activeSchema.label}</p>
+            <div className="mt-4 rounded-xl border border-border bg-background p-4">
+                <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold">{activeSchema.label}</p>
+                    <Badge variant="secondary">Active</Badge>
+                </div>
 
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     {activeSchema.description}
                 </p>
             </div>
 
-            <div className="mt-4 space-y-2">
+            <div className="mt-5 space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                        Available fields
+                    </p>
+                    <span className="text-xs text-muted-foreground">
+                        {activeSchema.fields.length} total
+                    </span>
+                </div>
+
                 {activeSchema.fields.map((field) => (
                     <div
                         key={field.name}
-                        className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm"
+                        className="flex items-center justify-between rounded-xl border border-border bg-background px-3 py-2.5 text-sm transition-colors hover:bg-muted/40"
                     >
-                        <span>{field.label}</span>
+                        <span className="font-medium">{field.label}</span>
                         <Badge variant="outline">{field.type}</Badge>
                     </div>
                 ))}

@@ -14,12 +14,31 @@ async function fillFirstValueInput(page: Page, value: string) {
 }
 
 async function expectRuleCount(page: Page, count: number) {
-    await expect(page.getByText(`${count} rules`, { exact: true }).first()).toBeVisible();
+    await expect(
+        page.getByText(`${count} rules`, { exact: true }).first(),
+    ).toBeVisible();
 }
+
+test.describe("Landing page", () => {
+    test("links users into the query builder", async ({ page }) => {
+        await page.goto("/");
+
+        await expect(
+            page.getByRole("heading", {
+                name: "Build complex queries without writing raw syntax.",
+            }),
+        ).toBeVisible();
+
+        await page.getByRole("link", { name: /Get Started/i }).first().click();
+
+        await expect(page).toHaveURL(/\/builder/);
+        await expect(page.getByText("Query Builder Canvas")).toBeVisible();
+    });
+});
 
 test.describe("Visual Query Builder browser flows", () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto("/");
+        await page.goto("/builder");
         await page.evaluate(() => {
             window.localStorage.clear();
         });
@@ -98,33 +117,29 @@ test.describe("Visual Query Builder browser flows", () => {
     test("exports and rejects invalid imported JSON", async ({ page }) => {
         await page.getByTestId("export-json-button").click();
 
-        await expect(
-            page.getByRole("heading", { name: "Export query JSON" }),
-        ).toBeVisible();
+        await expect(page.getByTestId("export-json-dialog")).toBeVisible();
 
-        await expect(
-            page.getByRole("textbox", { name: "Exported query JSON" }),
-        ).toHaveValue(/"version": 1/);
+        await expect(page.getByTestId("export-json-textarea")).toHaveValue(
+            /"version": 1/,
+        );
 
         await page.keyboard.press("Escape");
 
-        await expect(
-            page.getByRole("heading", { name: "Export query JSON" }),
-        ).toBeHidden();
+        await expect(page.getByTestId("export-json-dialog")).toBeHidden();
 
         await page.getByTestId("import-json-button").click();
 
-        await expect(
-            page.getByRole("heading", { name: "Import query JSON" }),
-        ).toBeVisible();
+        await expect(page.getByTestId("import-json-dialog")).toBeVisible();
+
+        await page.getByTestId("import-json-textarea").fill("{ bad json");
 
         await page
-            .getByRole("textbox", { name: "Import query JSON" })
-            .fill("{ bad json");
-
-        await page.getByRole("button", { name: "Import Query" }).click();
-
-        await expect(page.getByText("Expected property name or")).toBeVisible();
+            .getByTestId("import-json-dialog")
+            .getByRole("button", { name: "Import Query", exact: true })
+            .click();
+        await expect(page.getByTestId("import-json-error")).toContainText(
+            /Expected property name|Unexpected token|JSON/i,
+        );
     });
 
     test("saves a preset and keeps it after refresh", async ({ page }) => {
@@ -144,16 +159,20 @@ test.describe("Visual Query Builder browser flows", () => {
         await expect(page.getByText("Ada query")).toBeVisible();
     });
 
-    test("toggles dark mode and persists theme after refresh", async ({ page }) => {
-        await page.getByRole("button", { name: /Switch to dark mode/i }).click();
-
+    test("toggles light mode and persists theme after refresh", async ({ page }) => {
         const html = page.locator("html");
 
         await expect(html).toHaveClass(/dark/);
 
+        await page
+            .getByRole("button", { name: /Light|Switch to light mode/i })
+            .click();
+
+        await expect(html).toHaveClass(/light/);
+
         await page.reload();
 
-        await expect(html).toHaveClass(/dark/);
+        await expect(html).toHaveClass(/light/);
     });
 
     test("shows drag handles after adding a second rule", async ({ page }) => {

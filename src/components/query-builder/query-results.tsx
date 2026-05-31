@@ -38,13 +38,19 @@ function formatCellValue(value: MockRecord[string]) {
     return String(value);
 }
 
+function getRecordKey(record: MockRecord, index: number) {
+    const preferredKey =
+        record.id ?? record.orderId ?? record.email ?? record.title ?? record.name;
+
+    return preferredKey ? String(preferredKey) : `record-${index}`;
+}
+
 export function QueryResults({
     runId,
     isRunning,
     executedQueryTree,
     executedSchema,
 }: QueryResultsProps) {
-
     const [sortField, setSortField] = useState<string | null>(null);
     const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
     const [page, setPage] = useState(1);
@@ -85,17 +91,6 @@ export function QueryResults({
         safePage * PAGE_SIZE,
     );
 
-    function getRecordKey(record: MockRecord, index: number) {
-        const preferredKey =
-            record.id ??
-            record.orderId ??
-            record.email ??
-            record.title ??
-            record.name;
-
-        return preferredKey ? String(preferredKey) : `record-${index}`;
-    }
-
     function handleSortFieldChange(fieldName: string) {
         setSortField(fieldName);
         setPage(1);
@@ -107,9 +102,9 @@ export function QueryResults({
 
     if (isRunning) {
         return (
-            <section className="rounded-lg border border-border bg-card p-4">
-                <p className="text-sm font-medium">Execution Results</p>
-                <div className="mt-3 rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
+            <section className="rounded-2xl border border-border bg-card p-4">
+                <p className="text-sm font-semibold tracking-tight">Execution Results</p>
+                <div className="mt-3 rounded-xl border border-dashed border-border bg-background p-6 text-sm text-muted-foreground">
                     Running query against mock dataset...
                 </div>
             </section>
@@ -118,20 +113,22 @@ export function QueryResults({
 
     if (runId === 0) {
         return (
-            <section className="rounded-lg border border-border bg-card p-4">
-                <p className="text-sm font-medium">Execution Results</p>
-                <div className="mt-3 rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
-                    Run a valid query to inspect matching mock records.
+            <section className="rounded-2xl border border-border bg-card p-4">
+                <p className="text-sm font-semibold tracking-tight">Execution Results</p>
+                <div className="mt-3 rounded-xl border border-dashed border-border bg-background p-6 text-sm leading-6 text-muted-foreground">
+                    Build a valid query, then run it to inspect matching mock records here.
                 </div>
             </section>
         );
     }
 
     return (
-        <section className="rounded-lg border border-border bg-card p-4">
+        <section className="rounded-2xl border border-border bg-card p-4">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <p className="text-sm font-medium">Execution Results</p>
+                    <p className="text-sm font-semibold tracking-tight">
+                        Execution Results
+                    </p>
                     <p className="mt-1 text-sm text-muted-foreground">
                         Showing records from the {executedSchema?.label} mock dataset.
                     </p>
@@ -158,7 +155,12 @@ export function QueryResults({
                         </SelectContent>
                     </Select>
 
-                    <Button type="button" variant="outline" size="sm" onClick={handleToggleSortDirection}>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleToggleSortDirection}
+                    >
                         <ArrowDownUp className="mr-2 h-4 w-4" />
                         {sortDirection.toUpperCase()}
                     </Button>
@@ -166,17 +168,20 @@ export function QueryResults({
             </div>
 
             {execution.total === 0 ? (
-                <div className="mt-4 rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
-                    No matching records found. Try adjusting your filters.
+                <div className="mt-4 rounded-xl border border-dashed border-border bg-background p-6 text-sm leading-6 text-muted-foreground">
+                    No records matched this query. Try loosening one of your filters.
                 </div>
             ) : (
                 <>
-                    <div className="mt-4 overflow-x-auto rounded-lg border border-border">
+                    <div className="mt-4 overflow-x-auto rounded-xl border border-border">
                         <table className="w-full min-w-[720px] text-left text-sm">
-                            <thead className="border-b border-border bg-muted">
+                            <thead className="border-b border-border bg-background">
                                 <tr>
-                                        {executedSchema?.fields.map((field) => (
-                                        <th key={field.name} className="px-3 py-2 font-medium">
+                                    {executedSchema?.fields.map((field) => (
+                                        <th
+                                            key={field.name}
+                                            className="px-3 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+                                        >
                                             {field.label}
                                         </th>
                                     ))}
@@ -184,13 +189,13 @@ export function QueryResults({
                             </thead>
 
                             <tbody>
-                                    {paginatedRecords.map((record, index) => (
-                                        <tr
-                                            key={getRecordKey(record, index)}
-                                            className="border-b border-border last:border-b-0"
-                                        >
+                                {paginatedRecords.map((record, index) => (
+                                    <tr
+                                        key={getRecordKey(record, index)}
+                                        className="border-b border-border transition-colors last:border-b-0 hover:bg-muted/40"
+                                    >
                                         {executedSchema?.fields.map((field) => (
-                                            <td key={field.name} className="px-3 py-2">
+                                            <td key={field.name} className="px-3 py-3">
                                                 {formatCellValue(record[field.name])}
                                             </td>
                                         ))}

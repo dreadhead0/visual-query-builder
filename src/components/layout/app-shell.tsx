@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ArrowLeft, Play } from "lucide-react";
+import Link from "next/link";
 
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
     DataSourcePanel,
     KeyboardShortcutsDialog,
@@ -81,12 +83,7 @@ export function AppShell() {
             setRunId((current) => current + 1);
             setIsRunning(false);
         }, 450);
-    }, [
-        activeSchema,
-        queryTree,
-        recordQueryExecution,
-        validation.isValid,
-    ]);
+    }, [activeSchema, queryTree, recordQueryExecution, validation.isValid]);
 
     const handleSchemaChange = useCallback(() => {
         resetExecutionState();
@@ -114,69 +111,89 @@ export function AppShell() {
 
     return (
         <main className="min-h-screen bg-background text-foreground">
-            <section className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8">
-                <header className="flex flex-col gap-4 border-b border-border pb-6 md:flex-row md:items-center md:justify-between">
-                    <div className="space-y-2">
-                        <Badge variant="secondary" className="w-fit">
-                            Stage 8 Project
-                        </Badge>
+            <section className="mx-auto flex min-h-screen w-full max-w-[1500px] flex-col px-3 py-4 sm:px-5 lg:px-8">
+                <header className="liquid-shell rounded-[2rem] p-4 sm:p-5">
+                    <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                        <div className="space-y-3">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href="/">
+                                        <ArrowLeft className="mr-2 h-4 w-4" />
+                                        Landing
+                                    </Link>
+                                </Button>
 
-                        <div className="space-y-1">
-                            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                                Visual Query Builder
-                            </h1>
+                                <Badge variant="secondary">Builder Workspace</Badge>
+                                <Badge variant="outline">{activeSchema.label} schema</Badge>
+                            </div>
 
-                            <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-                                Build complex database and API filters visually using rules,
-                                nested groups, live previews, validation, and simulated query
-                                execution.
-                            </p>
+                            <div>
+                                <h1 className="text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
+                                    Visual Query Builder
+                                </h1>
+
+                                <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
+                                    Choose a schema, build rules, preview the generated
+                                    query, then run it against mock records.
+                                </p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="flex flex-wrap gap-2">
-                        <QueryJsonActions onImportSuccess={resetExecutionState} />
+                        <div className="liquid-panel rounded-3xl p-3">
+                            <div className="flex flex-wrap gap-2 xl:justify-end">
+                                <QueryJsonActions onImportSuccess={resetExecutionState} />
+                                <ThemeToggle />
+                                <Button variant="outline" onClick={handleOpenShortcuts}>
+                                    Shortcuts
+                                </Button>
+                                <Button variant="outline" onClick={handleResetQuery}>
+                                    Reset
+                                </Button>
+                            </div>
 
-                        <ThemeToggle />
+                            <div className="mt-3">
+                                <Button
+                                    size="lg"
+                                    className="w-full"
+                                    disabled={!validation.isValid || isRunning}
+                                    onClick={handleRunQuery}
+                                >
+                                    <Play className="mr-2 h-4 w-4" />
+                                    {isRunning ? "Running query..." : "Run Query"}
+                                </Button>
 
-                        <Button variant="outline" onClick={handleOpenShortcuts}>
-                            Shortcuts
-                        </Button>
-
-                        <Button variant="outline" onClick={handleResetQuery}>
-                            Reset
-                        </Button>
-
-                        <Button
-                            disabled={!validation.isValid || isRunning}
-                            onClick={handleRunQuery}
-                        >
-                            {isRunning ? "Running..." : "Run Query"}
-                        </Button>
+                                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                                    The run button unlocks once every rule is valid.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </header>
 
-                <div className="grid flex-1 gap-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)_360px]">
+                <div className="grid flex-1 gap-4 py-5 xl:grid-cols-[300px_minmax(0,1fr)_400px]">
                     <DataSourcePanel onSchemaChange={handleSchemaChange} />
 
-                    <section className="rounded-lg border border-border bg-card p-4">
+                    <section className="liquid-panel min-h-[520px] rounded-[1.75rem] p-4">
                         <QueryBuilder />
                     </section>
 
-                    <aside className="space-y-4 rounded-lg border border-border bg-card p-4">
+                    <aside className="liquid-panel space-y-4 rounded-[1.75rem] p-4">
                         <QueryPreview />
                         <ValidationPanel />
                     </aside>
                 </div>
 
-                <QueryLibrary onLoadQuery={resetExecutionState} />
+                <div className="grid gap-4 pb-6">
+                    <QueryLibrary onLoadQuery={resetExecutionState} />
 
-                <QueryResults
-                    runId={runId}
-                    isRunning={isRunning}
-                    executedQueryTree={executedQueryTree}
-                    executedSchema={executedSchema}
-                />
+                    <QueryResults
+                        runId={runId}
+                        isRunning={isRunning}
+                        executedQueryTree={executedQueryTree}
+                        executedSchema={executedSchema}
+                    />
+                </div>
+
                 <KeyboardShortcutsDialog
                     open={isShortcutsOpen}
                     onOpenChange={setIsShortcutsOpen}
