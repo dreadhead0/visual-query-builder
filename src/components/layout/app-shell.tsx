@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 import {
     DataSourcePanel,
@@ -135,6 +136,8 @@ export function AppShell() {
 
                     <div className="flex flex-wrap gap-2">
                         <QueryJsonActions onImportSuccess={resetExecutionState} />
+
+                        <ThemeToggle />
 
                         <Button variant="outline" onClick={handleOpenShortcuts}>
                             Shortcuts

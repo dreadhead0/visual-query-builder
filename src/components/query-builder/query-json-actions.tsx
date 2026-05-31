@@ -105,6 +105,8 @@ export function QueryJsonActions({ onImportSuccess }: QueryJsonActionsProps) {
                     </DialogHeader>
 
                     <Textarea
+                        name="exported-query-json"
+                        aria-label="Exported query JSON"
                         readOnly
                         value={exportedJson}
                         className="min-h-[320px] font-mono text-xs"
@@ -142,6 +144,8 @@ export function QueryJsonActions({ onImportSuccess }: QueryJsonActionsProps) {
                     </DialogHeader>
 
                     <Textarea
+                        name="import-query-json"
+                        aria-label="Import query JSON"
                         value={importText}
                         placeholder="Paste exported query JSON here..."
                         className="min-h-[320px] font-mono text-xs"

@@ -128,3 +128,44 @@
     @apply font-sans;
   }
 }
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  body,
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    transition: none;
+  }
+}

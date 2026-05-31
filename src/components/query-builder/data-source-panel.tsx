@@ -40,7 +40,11 @@ export function DataSourcePanel({ onSchemaChange }: DataSourcePanelProps) {
             </div>
 
             <div className="mt-4">
-                <Select value={activeSchemaId} onValueChange={handleSchemaChange}>
+                <Select
+                    name="active-schema"
+                    value={activeSchemaId}
+                    onValueChange={handleSchemaChange}
+                >
                     <SelectTrigger>
                         <SelectValue placeholder="Select schema" />
                     </SelectTrigger>

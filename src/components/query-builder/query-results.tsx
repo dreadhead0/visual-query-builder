@@ -130,6 +130,7 @@ export function QueryResults({
                     <Badge variant="outline">{execution.total} results</Badge>
 
                     <Select
+                        name="results-sort-field"
                         value={sortField ?? ""}
                         onValueChange={handleSortFieldChange}
                     >

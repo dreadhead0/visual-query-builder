@@ -45,7 +45,7 @@ export function QueryPreview() {
                 </Button>
             </div>
 
-            <pre className="max-h-[420px] overflow-auto rounded-lg border border-border bg-muted p-4 text-xs leading-5">
+            <pre className="max-h-[420px] overflow-auto rounded-lg border border-border bg-muted p-4 text-xs leading-5 transition-colors duration-200">
                 <code>{preview}</code>
             </pre>
         </div>

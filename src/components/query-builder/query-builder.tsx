@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import {
     countGroups,
     countRules,
@@ -25,6 +27,12 @@ import { Badge } from "@/components/ui/badge";
 import { QueryGroup } from "./query-group";
 
 export function QueryBuilder() {
+
+    const [isDndReady, setIsDndReady] = useState(false);
+
+    useEffect(() => {
+        setIsDndReady(true);
+    }, []);
     const activeSchema = useQueryBuilderStore(selectActiveSchema);
     const queryTree = useQueryBuilderStore(selectQueryTree);
 
@@ -101,15 +109,33 @@ export function QueryBuilder() {
                 </div>
             </div>
 
-            <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-            >
+            {isDndReady ? (
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                >
+                    <QueryGroup
+                        group={queryTree}
+                        schema={activeSchema}
+                        isRoot
+                        isSortable
+                        onAddRule={addRule}
+                        onAddGroup={addGroup}
+                        onRemoveNode={removeNode}
+                        onRuleFieldChange={updateRuleField}
+                        onRuleOperatorChange={updateRuleOperator}
+                        onRuleValueChange={updateRuleValue}
+                        onGroupCombinatorChange={updateGroupCombinator}
+                        onToggleCollapsed={toggleGroupCollapsed}
+                    />
+                </DndContext>
+            ) : (
                 <QueryGroup
                     group={queryTree}
                     schema={activeSchema}
                     isRoot
+                    isSortable={false}
                     onAddRule={addRule}
                     onAddGroup={addGroup}
                     onRemoveNode={removeNode}
@@ -119,7 +145,7 @@ export function QueryBuilder() {
                     onGroupCombinatorChange={updateGroupCombinator}
                     onToggleCollapsed={toggleGroupCollapsed}
                 />
-            </DndContext>
+            )}
         </div>
     );
 }
