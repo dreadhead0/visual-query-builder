@@ -80,6 +80,7 @@ export function QueryRule({
                 </Select>
 
                 <QueryValueInput
+                    ruleId={rule.id}
                     field={selectedField}
                     operator={rule.operator}
                     value={rule.value}

@@ -3,7 +3,6 @@ import type {
     DataSchema,
     GroupNode,
     QueryNode,
-    QueryOperator,
     QueryValue,
     RuleNode,
 } from "./types";
@@ -40,6 +39,10 @@ function isRangeValue(
         "from" in value &&
         "to" in value
     );
+}
+
+function escapeRegExp(value: string) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function normalizeNumberValue(value: QueryValue) {
@@ -99,7 +102,7 @@ function generateRuleQuery(rule: RuleNode, schema: DataSchema): MongoQuery {
         case "contains":
             return {
                 [rule.field]: {
-                    $regex: String(value),
+                    $regex: escapeRegExp(String(value)),
                     $options: "i",
                 },
             };
@@ -107,7 +110,7 @@ function generateRuleQuery(rule: RuleNode, schema: DataSchema): MongoQuery {
         case "startsWith":
             return {
                 [rule.field]: {
-                    $regex: `^${String(value)}`,
+                    $regex: `^${escapeRegExp(String(value))}`,
                     $options: "i",
                 },
             };
