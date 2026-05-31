@@ -1,11 +1,9 @@
-import {
-    getFieldByName,
-    getSchemaById,
-} from "./schemas";
+import { getFieldByName, getSchemaById } from "./schemas";
 import {
     getOperatorDefinition,
     isOperatorAllowedForFieldType,
 } from "./operators";
+import { validateQueryTree } from "./query-validator";
 import type {
     DataSchema,
     GroupNode,
@@ -61,11 +59,13 @@ function isValidQueryOperator(value: unknown): value is QueryOperator {
     return isString(value) && Boolean(getOperatorDefinition(value as QueryOperator));
 }
 
-function isRangeValue(value: unknown): value is { from: string | number; to: string | number } {
+function isRangeValue(
+    value: unknown,
+): value is { from: string | number; to: string | number } {
     return (
         isPlainObject(value) &&
-        ("from" in value) &&
-        ("to" in value) &&
+        "from" in value &&
+        "to" in value &&
         (typeof value.from === "string" || typeof value.from === "number") &&
         (typeof value.to === "string" || typeof value.to === "number")
     );
@@ -130,7 +130,9 @@ function validateImportedRule(
     }
 
     if (!isValidQueryOperator(value.operator)) {
-        throw new Error(`The imported operator "${String(value.operator)}" is not supported.`);
+        throw new Error(
+            `The imported operator "${String(value.operator)}" is not supported.`,
+        );
     }
 
     if (!isOperatorAllowedForFieldType(value.operator, field.type)) {
@@ -176,7 +178,9 @@ function validateImportedGroup(
     }
 
     if (depth > MAX_IMPORT_DEPTH) {
-        throw new Error(`Imported query is too deeply nested. Maximum depth is ${MAX_IMPORT_DEPTH}.`);
+        throw new Error(
+            `Imported query is too deeply nested. Maximum depth is ${MAX_IMPORT_DEPTH}.`,
+        );
     }
 
     return {
@@ -198,7 +202,9 @@ function validateImportedQueryNode(
     context.nodeCount += 1;
 
     if (context.nodeCount > MAX_IMPORT_NODES) {
-        throw new Error(`Imported query has too many nodes. Maximum allowed is ${MAX_IMPORT_NODES}.`);
+        throw new Error(
+            `Imported query has too many nodes. Maximum allowed is ${MAX_IMPORT_NODES}.`,
+        );
     }
 
     if (!isPlainObject(value)) {
@@ -274,16 +280,23 @@ export function parseImportedQueryJson(rawJson: string): ImportQueryResult {
             nodeCount: 0,
         };
 
-        const queryTree = validateImportedQueryNode(
-            parsed.queryTree,
-            context,
-            1,
-        );
+        const queryTree = validateImportedQueryNode(parsed.queryTree, context, 1);
 
         if (queryTree.type !== "group") {
             return {
                 success: false,
                 error: "Imported queryTree must be a group at the root.",
+            };
+        }
+
+        const semanticValidation = validateQueryTree(queryTree, schema);
+
+        if (!semanticValidation.isValid) {
+            return {
+                success: false,
+                error:
+                    semanticValidation.errors[0]?.message ??
+                    "Imported query contains invalid values.",
             };
         }
 
