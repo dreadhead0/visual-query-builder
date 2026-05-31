@@ -150,6 +150,7 @@ export function QueryGroup({
                         type="button"
                         variant="outline"
                         size="sm"
+                        data-testid="add-rule-button"
                         onClick={() => onAddRule(group.id)}
                     >
                         <Plus className="mr-2 h-4 w-4" />
@@ -160,6 +161,7 @@ export function QueryGroup({
                         type="button"
                         variant="outline"
                         size="sm"
+                        data-testid="add-group-button"
                         onClick={() => onAddGroup(group.id)}
                     >
                         <Plus className="mr-2 h-4 w-4" />

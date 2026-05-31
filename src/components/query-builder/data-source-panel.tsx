@@ -45,7 +45,7 @@ export function DataSourcePanel({ onSchemaChange }: DataSourcePanelProps) {
                     value={activeSchemaId}
                     onValueChange={handleSchemaChange}
                 >
-                    <SelectTrigger>
+                    <SelectTrigger data-testid="schema-select-trigger">
                         <SelectValue placeholder="Select schema" />
                     </SelectTrigger>
 
