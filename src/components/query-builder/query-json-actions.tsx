@@ -89,7 +89,7 @@ export function QueryJsonActions({ onImportSuccess }: QueryJsonActionsProps) {
         <>
             <Dialog open={isExportOpen} onOpenChange={setIsExportOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="outline">
+                    <Button variant="outline" data-testid="export-json-button">
                         <Download className="mr-2 h-4 w-4" />
                         Export JSON
                     </Button>
@@ -128,7 +128,7 @@ export function QueryJsonActions({ onImportSuccess }: QueryJsonActionsProps) {
 
             <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="outline">
+                    <Button variant="outline" data-testid="import-json-button">
                         <Upload className="mr-2 h-4 w-4" />
                         Import JSON
                     </Button>

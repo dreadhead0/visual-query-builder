@@ -46,7 +46,7 @@ export function QueryRule({
                     value={rule.field}
                     onValueChange={(fieldName) => onFieldChange(rule.id, fieldName)}
                 >
-                    <SelectTrigger>
+                    <SelectTrigger data-testid="rule-field-trigger">
                         <SelectValue placeholder="Select field" />
                     </SelectTrigger>
 
@@ -66,7 +66,7 @@ export function QueryRule({
                         onOperatorChange(rule.id, operator as RuleNode["operator"])
                     }
                 >
-                    <SelectTrigger>
+                    <SelectTrigger data-testid="rule-operator-trigger">
                         <SelectValue placeholder="Select operator" />
                     </SelectTrigger>
 
