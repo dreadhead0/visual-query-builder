@@ -67,7 +67,7 @@ export function QueryGroup({
     onToggleCollapsed,
 }: QueryGroupProps) {
     const childSummary = getChildSummary(group.children);
-    const isDeepGroup = depth >= 3;
+    const isDeepGroup = depth >= 2;
 
     function renderChild(child: QueryNode) {
         if (child.type === "rule") {
@@ -102,12 +102,19 @@ export function QueryGroup({
         );
     }
 
+    const wrapperClassName = isDeepGroup
+        ? "min-w-0 border-l border-border/70 pl-3"
+        : "liquid-surface min-w-0 rounded-2xl transition-colors duration-200";
+
+    const headerClassName = isDeepGroup
+        ? "space-y-3 pb-3"
+        : "space-y-3 border-b border-border p-3";
+
+    const bodyClassName = isDeepGroup ? "space-y-2 pb-2" : "space-y-3 p-3";
+
     return (
-        <div
-            className="liquid-surface min-w-0 rounded-2xl transition-colors duration-200"
-            data-depth={depth}
-        >
-            <div className="grid gap-3 border-b border-border p-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+        <div className={wrapperClassName} data-depth={depth}>
+            <div className={headerClassName}>
                 <div className="flex min-w-0 flex-wrap items-center gap-2">
                     <Button
                         type="button"
@@ -129,6 +136,12 @@ export function QueryGroup({
 
                     <Badge variant="outline">Depth {depth + 1}</Badge>
 
+                    <span className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground">
+                        {childSummary}
+                    </span>
+                </div>
+
+                <div className="grid min-w-0 gap-2 lg:grid-cols-[120px_minmax(0,1fr)]">
                     <Select
                         name={`${group.id}-combinator`}
                         value={group.combinator}
@@ -136,7 +149,7 @@ export function QueryGroup({
                             onGroupCombinatorChange(group.id, value as LogicalOperator)
                         }
                     >
-                        <SelectTrigger className="w-[104px]">
+                        <SelectTrigger className="h-9 w-[88px]">
                             <SelectValue />
                         </SelectTrigger>
 
@@ -146,51 +159,49 @@ export function QueryGroup({
                         </SelectContent>
                     </Select>
 
-                    <span className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground">
-                        {childSummary}
-                    </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        data-testid="add-rule-button"
-                        onClick={() => onAddRule(group.id)}
-                    >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Rule
-                    </Button>
-
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        data-testid="add-group-button"
-                        onClick={() => onAddGroup(group.id)}
-                    >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Group
-                    </Button>
-
-                    {!isRoot && (
+                    <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 xl:flex xl:flex-wrap xl:justify-end">
                         <Button
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="col-span-2 sm:col-span-1"
-                            onClick={() => onRemoveNode(group.id)}
+                            data-testid="add-rule-button"
+                            className="w-full xl:w-auto"
+                            onClick={() => onAddRule(group.id)}
                         >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Remove
+                            <Plus className="mr-2 h-4 w-4" />
+                            Add Rule
                         </Button>
-                    )}
+
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            data-testid="add-group-button"
+                            className="w-full xl:w-auto"
+                            onClick={() => onAddGroup(group.id)}
+                        >
+                            <Plus className="mr-2 h-4 w-4" />
+                            Add Group
+                        </Button>
+
+                        {!isRoot && (
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="w-full sm:col-span-2 xl:w-auto"
+                                onClick={() => onRemoveNode(group.id)}
+                            >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Remove
+                            </Button>
+                        )}
+                    </div>
                 </div>
             </div>
 
             {!group.collapsed && (
-                <div className={isDeepGroup ? "space-y-2 p-2" : "space-y-3 p-3"}>
+                <div className={bodyClassName}>
                     {group.children.length === 0 ? (
                         <div className="liquid-readable rounded-xl border-dashed p-4 text-sm leading-6 text-muted-foreground">
                             This group is empty. Add at least one rule or nested group.

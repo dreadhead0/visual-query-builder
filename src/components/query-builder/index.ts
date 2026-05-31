@@ -6,6 +6,7 @@ export * from "./query-preview";
 export * from "./validation-panel";
 export * from "./query-results";
 export * from "./data-source-panel";
+export * from "./data-source-bar";
 export * from "./query-library";
 export * from "./query-json-actions";
 export * from "./keyboard-shortcuts-dialog";

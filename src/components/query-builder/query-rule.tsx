@@ -41,20 +41,17 @@ export function QueryRule({
     const operators = getOperatorsForFieldType(selectedField.type);
 
     return (
-        <div className="liquid-readable min-w-0 rounded-2xl p-3 transition-colors duration-200 hover:bg-muted/35">
-            <div
-                className={
-                    compact
-                        ? "grid min-w-0 gap-2"
-                        : "grid min-w-0 gap-3 xl:grid-cols-[minmax(120px,1fr)_minmax(120px,1fr)_minmax(160px,1.2fr)_auto]"
-                }
-            >
+        <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-background/70 p-3 transition-colors duration-200 hover:bg-muted/30">
+            <div className="grid min-w-0 gap-3">
                 <Select
                     name={`${rule.id}-field`}
                     value={rule.field}
                     onValueChange={(fieldName) => onFieldChange(rule.id, fieldName)}
                 >
-                    <SelectTrigger data-testid="rule-field-trigger" className="min-w-0">
+                    <SelectTrigger
+                        data-testid="rule-field-trigger"
+                        className="h-9 w-full min-w-0"
+                    >
                         <SelectValue placeholder="Select field" />
                     </SelectTrigger>
 
@@ -76,7 +73,7 @@ export function QueryRule({
                 >
                     <SelectTrigger
                         data-testid="rule-operator-trigger"
-                        className="min-w-0"
+                        className="h-9 w-full min-w-0"
                     >
                         <SelectValue placeholder="Select operator" />
                     </SelectTrigger>
@@ -90,23 +87,26 @@ export function QueryRule({
                     </SelectContent>
                 </Select>
 
-                <QueryValueInput
-                    ruleId={rule.id}
-                    field={selectedField}
-                    operator={rule.operator}
-                    value={rule.value}
-                    onChange={(value) => onValueChange(rule.id, value)}
-                />
+                <div className="min-w-0">
+                    <QueryValueInput
+                        ruleId={rule.id}
+                        field={selectedField}
+                        operator={rule.operator}
+                        value={rule.value}
+                        onChange={(value) => onValueChange(rule.id, value)}
+                    />
+                </div>
 
                 <Button
                     type="button"
                     variant="outline"
-                    size="icon"
+                    size="sm"
                     aria-label="Remove rule"
-                    className={compact ? "w-full" : ""}
+                    className="h-9 w-full justify-center"
                     onClick={() => onRemove(rule.id)}
                 >
                     <Trash2 className="h-4 w-4" />
+                    <span className="ml-2">{compact ? "Remove" : "Remove rule"}</span>
                 </Button>
             </div>
         </div>

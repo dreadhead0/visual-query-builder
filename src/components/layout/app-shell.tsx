@@ -6,7 +6,7 @@ import Link from "next/link";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
-    DataSourcePanel,
+    DataSourceBar,
     KeyboardShortcutsDialog,
     QueryBuilder,
     QueryJsonActions,
@@ -170,17 +170,19 @@ export function AppShell() {
                     </div>
                 </header>
 
-                <div className="grid flex-1 gap-4 py-5 xl:grid-cols-[300px_minmax(0,1fr)_400px]">
-                    <DataSourcePanel onSchemaChange={handleSchemaChange} />
+                <div className="grid gap-4 py-5">
+                    <DataSourceBar onSchemaChange={handleSchemaChange} />
 
-                    <section className="liquid-panel min-h-[520px] rounded-[1.75rem] p-4">
-                        <QueryBuilder />
-                    </section>
+                    <div className="grid min-h-[620px] gap-4 xl:grid-cols-[minmax(0,1fr)_400px]">
+                        <section className="liquid-panel min-w-0 rounded-[1.75rem] p-4">
+                            <QueryBuilder />
+                        </section>
 
-                    <aside className="liquid-panel space-y-4 rounded-[1.75rem] p-4">
-                        <QueryPreview />
-                        <ValidationPanel />
-                    </aside>
+                        <aside className="liquid-panel space-y-4 rounded-[1.75rem] p-4 xl:sticky xl:top-4 xl:self-start">
+                            <QueryPreview />
+                            <ValidationPanel />
+                        </aside>
+                    </div>
                 </div>
 
                 <div className="grid gap-4 pb-6">
