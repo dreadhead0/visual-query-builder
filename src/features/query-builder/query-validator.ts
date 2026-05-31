@@ -2,12 +2,12 @@ import { getFieldByName } from "./schemas";
 import { getOperatorDefinition, isOperatorAllowedForFieldType } from "./operators";
 import type {
     DataSchema,
-    FieldType,
     GroupNode,
     QueryNode,
     QueryOperator,
     QueryValue,
     RuleNode,
+    SchemaField,
 } from "./types";
 
 export type ValidationSeverity = "error" | "warning";
@@ -141,9 +141,140 @@ function isInvalidDateRange(value: QueryValue) {
     return fromTime > toTime;
 }
 
-function validateValueForFieldType(
+function isInvalidEnumValue(field: SchemaField, value: QueryValue) {
+    if (!field.options || field.options.length === 0) {
+        return false;
+    }
+
+    if (Array.isArray(value)) {
+        return value.some((item) => !field.options?.includes(String(item)));
+    }
+
+    return typeof value !== "string" || !field.options.includes(value);
+}
+
+function validateNumberValue(
     nodeId: string,
-    fieldType: FieldType,
+    operator: QueryOperator,
+    value: QueryValue,
+): ValidationIssue[] {
+    const issues: ValidationIssue[] = [];
+
+    if (operator === "between") {
+        if (isInvalidNumberRange(value)) {
+            issues.push(
+                createValidationIssue(
+                    nodeId,
+                    "error",
+                    "Enter a valid number range where the first value is not greater than the second.",
+                ),
+            );
+        }
+
+        return issues;
+    }
+
+    if (operator === "inArray") {
+        if (
+            !Array.isArray(value) ||
+            value.some((item) => Number.isNaN(Number(item)))
+        ) {
+            issues.push(
+                createValidationIssue(
+                    nodeId,
+                    "error",
+                    "Enter a comma-separated list of valid numbers.",
+                ),
+            );
+        }
+
+        return issues;
+    }
+
+    if (isInvalidNumber(value)) {
+        issues.push(
+            createValidationIssue(nodeId, "error", "Enter a valid number."),
+        );
+    }
+
+    return issues;
+}
+
+function validateDateValue(
+    nodeId: string,
+    operator: QueryOperator,
+    value: QueryValue,
+): ValidationIssue[] {
+    const issues: ValidationIssue[] = [];
+
+    if (operator === "between") {
+        if (isInvalidDateRange(value)) {
+            issues.push(
+                createValidationIssue(
+                    nodeId,
+                    "error",
+                    "Enter a valid date range where the start date is not after the end date.",
+                ),
+            );
+        }
+
+        return issues;
+    }
+
+    if (
+        operator === "before" ||
+        operator === "after" ||
+        operator === "equals" ||
+        operator === "notEquals"
+    ) {
+        if (isInvalidDateValue(value)) {
+            issues.push(
+                createValidationIssue(nodeId, "error", "Enter a valid date."),
+            );
+        }
+    }
+
+    return issues;
+}
+
+function validateEnumValue(
+    nodeId: string,
+    field: SchemaField,
+    operator: QueryOperator,
+    value: QueryValue,
+): ValidationIssue[] {
+    const issues: ValidationIssue[] = [];
+
+    if (operator === "isNull" || operator === "isNotNull") {
+        return issues;
+    }
+
+    if (operator === "inArray") {
+        if (!Array.isArray(value) || isInvalidEnumValue(field, value)) {
+            issues.push(
+                createValidationIssue(
+                    nodeId,
+                    "error",
+                    "Select one or more valid options from the schema.",
+                ),
+            );
+        }
+
+        return issues;
+    }
+
+    if (isInvalidEnumValue(field, value)) {
+        issues.push(
+            createValidationIssue(nodeId, "error", "Select a valid schema option."),
+        );
+    }
+
+    return issues;
+}
+
+function validateValueForField(
+    nodeId: string,
+    field: SchemaField,
     operator: QueryOperator,
     value: QueryValue,
 ): ValidationIssue[] {
@@ -169,82 +300,19 @@ function validateValueForFieldType(
         return issues;
     }
 
-    if (fieldType === "number") {
-        if (operator === "between") {
-            if (isInvalidNumberRange(value)) {
-                issues.push(
-                    createValidationIssue(
-                        nodeId,
-                        "error",
-                        "Enter a valid number range where the first value is not greater than the second.",
-                    ),
-                );
-            }
-
-            return issues;
-        }
-
-        if (operator === "inArray") {
-            if (
-                !Array.isArray(value) ||
-                value.some((item) => Number.isNaN(Number(item)))
-            ) {
-                issues.push(
-                    createValidationIssue(
-                        nodeId,
-                        "error",
-                        "Enter a comma-separated list of valid numbers.",
-                    ),
-                );
-            }
-
-            return issues;
-        }
-
-        if (isInvalidNumber(value)) {
-            issues.push(
-                createValidationIssue(nodeId, "error", "Enter a valid number."),
-            );
-        }
+    if (field.type === "number") {
+        return validateNumberValue(nodeId, operator, value);
     }
 
-    if (fieldType === "date") {
-        if (operator === "between") {
-            if (isInvalidDateRange(value)) {
-                issues.push(
-                    createValidationIssue(
-                        nodeId,
-                        "error",
-                        "Enter a valid date range where the start date is not after the end date.",
-                    ),
-                );
-            }
-
-            return issues;
-        }
-
-        if (operator === "before" || operator === "after" || operator === "equals" || operator === "notEquals") {
-            if (isInvalidDateValue(value)) {
-                issues.push(
-                    createValidationIssue(nodeId, "error", "Enter a valid date."),
-                );
-            }
-        }
+    if (field.type === "date") {
+        return validateDateValue(nodeId, operator, value);
     }
 
-    if (fieldType === "enum") {
-        if (Array.isArray(value)) {
-            return issues;
-        }
-
-        if (typeof value !== "string") {
-            issues.push(
-                createValidationIssue(nodeId, "error", "Select a valid option."),
-            );
-        }
+    if (field.type === "enum") {
+        return validateEnumValue(nodeId, field, operator, value);
     }
 
-    if (fieldType === "boolean" && typeof value !== "boolean") {
+    if (field.type === "boolean" && typeof value !== "boolean") {
         issues.push(
             createValidationIssue(nodeId, "error", "Select either true or false."),
         );
@@ -293,9 +361,7 @@ function validateRule(rule: RuleNode, schema: DataSchema): ValidationIssue[] {
         return issues;
     }
 
-    issues.push(
-        ...validateValueForFieldType(rule.id, field.type, rule.operator, rule.value),
-    );
+    issues.push(...validateValueForField(rule.id, field, rule.operator, rule.value));
 
     return issues;
 }
