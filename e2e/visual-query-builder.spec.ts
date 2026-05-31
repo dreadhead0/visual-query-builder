@@ -1,16 +1,42 @@
 import { expect, test, type Page } from "@playwright/test";
 
+async function openFirstRuleEditor(page: Page) {
+    if (
+        await page
+            .getByTestId("rule-field-trigger")
+            .first()
+            .isVisible()
+            .catch(() => false)
+    ) {
+        return;
+    }
+
+    await page.getByTestId("query-tree-rule").first().click();
+
+    await expect(page.getByTestId("selected-rule-editor")).toBeVisible();
+    await expect(page.getByTestId("rule-field-trigger").first()).toBeVisible();
+    await expect(page.getByTestId("rule-operator-trigger").first()).toBeVisible();
+}
 async function selectRadixOption(
     page: Page,
     triggerTestId: string,
     optionName: string,
 ) {
+    if (triggerTestId.startsWith("rule-")) {
+        await openFirstRuleEditor(page);
+    }
+
     await page.getByTestId(triggerTestId).first().click();
     await page.getByRole("option", { name: optionName, exact: true }).click();
 }
 
 async function fillFirstValueInput(page: Page, value: string) {
-    await page.getByPlaceholder("Enter value").first().fill(value);
+    await openFirstRuleEditor(page);
+
+    const input = page.getByPlaceholder("Enter value").first();
+
+    await expect(input).toBeVisible();
+    await input.fill(value);
 }
 
 async function expectRuleCount(page: Page, count: number) {

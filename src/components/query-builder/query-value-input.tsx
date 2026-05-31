@@ -61,7 +61,7 @@ export function QueryValueInput({
 
     if (operator === "isNull" || operator === "isNotNull") {
         return (
-            <div className="rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
+            <div className="w-full min-w-0 rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
                 No value needed
             </div>
         );
@@ -71,13 +71,14 @@ export function QueryValueInput({
         const rangeValue = isRangeValue(value) ? value : { from: "", to: "" };
 
         return (
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid w-full min-w-0 gap-2">
                 <Input
                     name={`${controlName}-from`}
                     aria-label={`${field.label} from value`}
                     type={getTextInputType(field)}
                     value={String(rangeValue.from)}
                     placeholder="From"
+                    className="h-9 w-full min-w-0"
                     onChange={(event) =>
                         onChange({
                             from: event.target.value,
@@ -92,6 +93,7 @@ export function QueryValueInput({
                     type={getTextInputType(field)}
                     value={String(rangeValue.to)}
                     placeholder="To"
+                    className="h-9 w-full min-w-0"
                     onChange={(event) =>
                         onChange({
                             from: rangeValue.from,
@@ -110,7 +112,7 @@ export function QueryValueInput({
                 value={String(value)}
                 onValueChange={(nextValue) => onChange(nextValue === "true")}
             >
-                <SelectTrigger>
+                <SelectTrigger className="h-9 w-full min-w-0">
                     <SelectValue placeholder="Select value" />
                 </SelectTrigger>
 
@@ -125,7 +127,7 @@ export function QueryValueInput({
     if (field.type === "enum" && field.options) {
         return (
             <Select name={controlName} value={String(value)} onValueChange={onChange}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9 w-full min-w-0">
                     <SelectValue placeholder="Select value" />
                 </SelectTrigger>
 
@@ -147,6 +149,7 @@ export function QueryValueInput({
                 aria-label={`${field.label} values`}
                 value={Array.isArray(value) ? value.join(", ") : ""}
                 placeholder="Separate values with commas"
+                className="h-9 w-full min-w-0"
                 onChange={(event) =>
                     onChange(
                         event.target.value
@@ -166,6 +169,7 @@ export function QueryValueInput({
             type={getTextInputType(field)}
             value={String(value ?? "")}
             placeholder="Enter value"
+            className="h-9 w-full min-w-0"
             onChange={(event) => onChange(event.target.value)}
         />
     );

@@ -21,6 +21,7 @@ import { QueryValueInput } from "./query-value-input";
 type QueryRuleProps = {
     rule: RuleNode;
     schema: DataSchema;
+    compact?: boolean;
     onFieldChange: (ruleId: string, fieldName: string) => void;
     onOperatorChange: (ruleId: string, operator: RuleNode["operator"]) => void;
     onValueChange: (ruleId: string, value: RuleNode["value"]) => void;
@@ -30,6 +31,7 @@ type QueryRuleProps = {
 export function QueryRule({
     rule,
     schema,
+    compact = false,
     onFieldChange,
     onOperatorChange,
     onValueChange,
@@ -39,14 +41,17 @@ export function QueryRule({
     const operators = getOperatorsForFieldType(selectedField.type);
 
     return (
-        <div className="rounded-xl border border-border bg-background p-3 transition-colors duration-200 hover:bg-muted/40">
-            <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)_auto]">
+        <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-background/70 p-3 transition-colors duration-200 hover:bg-muted/30">
+            <div className="grid min-w-0 gap-3">
                 <Select
                     name={`${rule.id}-field`}
                     value={rule.field}
                     onValueChange={(fieldName) => onFieldChange(rule.id, fieldName)}
                 >
-                    <SelectTrigger data-testid="rule-field-trigger">
+                    <SelectTrigger
+                        data-testid="rule-field-trigger"
+                        className="h-9 w-full min-w-0"
+                    >
                         <SelectValue placeholder="Select field" />
                     </SelectTrigger>
 
@@ -66,7 +71,10 @@ export function QueryRule({
                         onOperatorChange(rule.id, operator as RuleNode["operator"])
                     }
                 >
-                    <SelectTrigger data-testid="rule-operator-trigger">
+                    <SelectTrigger
+                        data-testid="rule-operator-trigger"
+                        className="h-9 w-full min-w-0"
+                    >
                         <SelectValue placeholder="Select operator" />
                     </SelectTrigger>
 
@@ -79,22 +87,26 @@ export function QueryRule({
                     </SelectContent>
                 </Select>
 
-                <QueryValueInput
-                    ruleId={rule.id}
-                    field={selectedField}
-                    operator={rule.operator}
-                    value={rule.value}
-                    onChange={(value) => onValueChange(rule.id, value)}
-                />
+                <div className="min-w-0">
+                    <QueryValueInput
+                        ruleId={rule.id}
+                        field={selectedField}
+                        operator={rule.operator}
+                        value={rule.value}
+                        onChange={(value) => onValueChange(rule.id, value)}
+                    />
+                </div>
 
                 <Button
                     type="button"
                     variant="outline"
-                    size="icon"
+                    size="sm"
                     aria-label="Remove rule"
+                    className="h-9 w-full justify-center"
                     onClick={() => onRemove(rule.id)}
                 >
                     <Trash2 className="h-4 w-4" />
+                    <span className="ml-2">{compact ? "Remove" : "Remove rule"}</span>
                 </Button>
             </div>
         </div>
