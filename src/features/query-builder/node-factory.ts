@@ -12,6 +12,10 @@ function createNodeId(prefix: "rule" | "group") {
     return `${prefix}_${crypto.randomUUID()}`;
 }
 
+function createStableNodeId(prefix: "rule" | "group", schemaId: string) {
+    return `${prefix}_${schemaId}_initial`;
+}
+
 function getDefaultValueForOperator(operator: QueryOperator): QueryValue {
     if (operator === "between") {
         return {
@@ -43,6 +47,18 @@ export function createRuleNode(schema: DataSchema): RuleNode {
     };
 }
 
+function createInitialRuleNode(schema: DataSchema): RuleNode {
+    const defaultField = getDefaultFieldForSchema(schema);
+
+    return {
+        id: createStableNodeId("rule", schema.id),
+        type: "rule",
+        field: defaultField.name,
+        operator: "equals",
+        value: getDefaultValueForOperator("equals"),
+    };
+}
+
 export function createGroupNode(
     combinator: LogicalOperator = "AND",
     children: GroupNode["children"] = [],
@@ -57,5 +73,11 @@ export function createGroupNode(
 }
 
 export function createInitialQueryTree(schema: DataSchema): GroupNode {
-    return createGroupNode("AND", [createRuleNode(schema)]);
+    return {
+        id: createStableNodeId("group", schema.id),
+        type: "group",
+        combinator: "AND",
+        collapsed: false,
+        children: [createInitialRuleNode(schema)],
+    };
 }

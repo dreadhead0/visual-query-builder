@@ -41,7 +41,11 @@ export function SortableQueryNode({
         <div
             ref={setNodeRef}
             style={style}
-            className={isDragging ? "opacity-60" : undefined}
+            className={
+                isDragging
+                    ? "opacity-60 transition-opacity duration-150"
+                    : "transition-opacity duration-150"
+            }
         >
             <div className="grid gap-2 sm:grid-cols-[auto_minmax(0,1fr)]">
                 <Button
@@ -50,7 +54,7 @@ export function SortableQueryNode({
                     variant="outline"
                     size="icon"
                     aria-label="Drag to reorder"
-                    className="h-9 w-9 cursor-grab active:cursor-grabbing"
+                    className="h-9 w-9 cursor-grab active:cursor-grabbing transition-colors"
                     {...attributes}
                     {...listeners}
                 >

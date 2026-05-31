@@ -61,6 +61,8 @@ export function QueryValueInput({
         return (
             <div className="grid gap-2 sm:grid-cols-2">
                 <Input
+                    name={`${field.name}-${operator}-from`}
+                    aria-label={`${field.label} from value`}
                     type={getTextInputType(field)}
                     value={String(rangeValue.from)}
                     placeholder="From"
@@ -73,6 +75,8 @@ export function QueryValueInput({
                 />
 
                 <Input
+                    name={`${field.name}-${operator}-to`}
+                    aria-label={`${field.label} to value`}
                     type={getTextInputType(field)}
                     value={String(rangeValue.to)}
                     placeholder="To"
@@ -90,6 +94,7 @@ export function QueryValueInput({
     if (field.type === "boolean") {
         return (
             <Select
+                name={`${field.name}-${operator}`}
                 value={String(value)}
                 onValueChange={(nextValue) => onChange(nextValue === "true")}
             >
@@ -107,7 +112,11 @@ export function QueryValueInput({
 
     if (field.type === "enum" && field.options) {
         return (
-            <Select value={String(value)} onValueChange={onChange}>
+            <Select
+                name={`${field.name}-${operator}`}
+                value={String(value)}
+                onValueChange={onChange}
+            >
                 <SelectTrigger>
                     <SelectValue placeholder="Select value" />
                 </SelectTrigger>
@@ -126,6 +135,8 @@ export function QueryValueInput({
     if (operator === "inArray") {
         return (
             <Input
+                name={`${field.name}-${operator}`}
+                aria-label={`${field.label} values`}
                 value={Array.isArray(value) ? value.join(", ") : ""}
                 placeholder="Separate values with commas"
                 onChange={(event) =>
@@ -142,6 +153,8 @@ export function QueryValueInput({
 
     return (
         <Input
+            name={`${field.name}-${operator}`}
+            aria-label={`${field.label} value`}
             type={getTextInputType(field)}
             value={String(value ?? "")}
             placeholder="Enter value"

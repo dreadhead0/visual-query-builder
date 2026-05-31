@@ -39,9 +39,10 @@ export function QueryRule({
     const operators = getOperatorsForFieldType(selectedField.type);
 
     return (
-        <div className="rounded-lg border border-border bg-background p-3">
+        <div className="rounded-lg border border-border bg-background p-3 transition-colors duration-200 hover:bg-muted/40">
             <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)_auto]">
                 <Select
+                    name={`${rule.id}-field`}
                     value={rule.field}
                     onValueChange={(fieldName) => onFieldChange(rule.id, fieldName)}
                 >
@@ -59,6 +60,7 @@ export function QueryRule({
                 </Select>
 
                 <Select
+                    name={`${rule.id}-operator`}
                     value={rule.operator}
                     onValueChange={(operator) =>
                         onOperatorChange(rule.id, operator as RuleNode["operator"])

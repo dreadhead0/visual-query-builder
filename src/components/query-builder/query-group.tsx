@@ -29,6 +29,7 @@ type QueryGroupProps = {
     schema: DataSchema;
     depth?: number;
     isRoot?: boolean;
+    isSortable?: boolean;
     onAddRule: (groupId: string) => void;
     onAddGroup: (groupId: string) => void;
     onRemoveNode: (nodeId: string) => void;
@@ -55,6 +56,7 @@ export function QueryGroup({
     schema,
     depth = 0,
     isRoot = false,
+    isSortable = true,
     onAddRule,
     onAddGroup,
     onRemoveNode,
@@ -66,12 +68,44 @@ export function QueryGroup({
 }: QueryGroupProps) {
     const childSummary = getChildSummary(group.children);
 
+    function renderChild(child: QueryNode) {
+        if (child.type === "rule") {
+            return (
+                <QueryRule
+                    rule={child}
+                    schema={schema}
+                    onFieldChange={onRuleFieldChange}
+                    onOperatorChange={onRuleOperatorChange}
+                    onValueChange={onRuleValueChange}
+                    onRemove={onRemoveNode}
+                />
+            );
+        }
+
+        return (
+            <QueryGroup
+                group={child}
+                schema={schema}
+                depth={depth + 1}
+                isSortable={isSortable}
+                onAddRule={onAddRule}
+                onAddGroup={onAddGroup}
+                onRemoveNode={onRemoveNode}
+                onRuleFieldChange={onRuleFieldChange}
+                onRuleOperatorChange={onRuleOperatorChange}
+                onRuleValueChange={onRuleValueChange}
+                onGroupCombinatorChange={onGroupCombinatorChange}
+                onToggleCollapsed={onToggleCollapsed}
+            />
+        );
+    }
+
     return (
         <div
-            className="rounded-lg border border-border bg-card"
+            className="rounded-lg border border-border bg-card transition-colors duration-200"
             style={{ marginLeft: depth > 0 ? 16 : 0 }}
         >
-            <div className="flex flex-col gap-3 border-b border-border p-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-3 border-b border-border p-3 transition-colors duration-200 md:flex-row md:items-center md:justify-between">
                 <div className="flex flex-wrap items-center gap-2">
                     <Button
                         type="button"
@@ -92,6 +126,7 @@ export function QueryGroup({
                     </Badge>
 
                     <Select
+                        name={`${group.id}-combinator`}
                         value={group.combinator}
                         onValueChange={(value) =>
                             onGroupCombinatorChange(group.id, value as LogicalOperator)
@@ -146,12 +181,12 @@ export function QueryGroup({
             </div>
 
             {!group.collapsed && (
-                <div className="space-y-3 p-3">
+                <div className="space-y-3 p-3 transition-all duration-200">
                     {group.children.length === 0 ? (
                         <div className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
                             This group is empty. Add a rule or nested group to continue.
                         </div>
-                    ) : (
+                    ) : isSortable ? (
                         <SortableContext
                             items={group.children.map((child) => child.id)}
                             strategy={verticalListSortingStrategy}
@@ -163,34 +198,17 @@ export function QueryGroup({
                                         id={child.id}
                                         parentGroupId={group.id}
                                     >
-                                        {child.type === "rule" ? (
-                                            <QueryRule
-                                                rule={child}
-                                                schema={schema}
-                                                onFieldChange={onRuleFieldChange}
-                                                onOperatorChange={onRuleOperatorChange}
-                                                onValueChange={onRuleValueChange}
-                                                onRemove={onRemoveNode}
-                                            />
-                                        ) : (
-                                            <QueryGroup
-                                                group={child}
-                                                schema={schema}
-                                                depth={depth + 1}
-                                                onAddRule={onAddRule}
-                                                onAddGroup={onAddGroup}
-                                                onRemoveNode={onRemoveNode}
-                                                onRuleFieldChange={onRuleFieldChange}
-                                                onRuleOperatorChange={onRuleOperatorChange}
-                                                onRuleValueChange={onRuleValueChange}
-                                                onGroupCombinatorChange={onGroupCombinatorChange}
-                                                onToggleCollapsed={onToggleCollapsed}
-                                            />
-                                        )}
+                                        {renderChild(child)}
                                     </SortableQueryNode>
                                 ))}
                             </div>
                         </SortableContext>
+                    ) : (
+                        <div className="space-y-3">
+                            {group.children.map((child) => (
+                                <div key={child.id}>{renderChild(child)}</div>
+                            ))}
+                        </div>
                     )}
                 </div>
             )}

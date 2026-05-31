@@ -17,7 +17,7 @@ export function ValidationPanel() {
 
     if (validation.isValid) {
         return (
-            <div className="rounded-lg border border-border bg-card p-3">
+            <div className="rounded-lg border border-border bg-card p-3 transition-colors duration-200">
                 <div className="flex items-start gap-2">
                     <CheckCircle2 className="mt-0.5 h-4 w-4" />
 
@@ -37,7 +37,7 @@ export function ValidationPanel() {
     }
 
     return (
-        <div className="rounded-lg border border-border bg-card p-3">
+        <div className="rounded-lg border border-border bg-card p-3 transition-colors duration-200">
             <div className="flex items-start gap-2">
                 <AlertCircle className="mt-0.5 h-4 w-4" />
 
