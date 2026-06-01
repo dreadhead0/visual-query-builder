@@ -1,12 +1,6 @@
 "use client";
 
-import {
-    useCallback,
-    useEffect,
-    useMemo,
-    useState,
-    useSyncExternalStore,
-} from "react";
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { DragEndEvent } from "@dnd-kit/core";
 
 import {
@@ -165,18 +159,12 @@ export function QueryBuilder() {
                         {treeStats.totalGroups} nested group
                         {treeStats.totalGroups === 1 ? "" : "s"}
                     </Badge>
-
-                    <Badge variant="outline" className="state-valid">
-                        {treeStats.totalRules} rules
-                    </Badge>
-
-                    <Badge variant="outline" className="logic-or">
-                        Depth {treeStats.treeDepth}
-                    </Badge>
+                    <Badge variant="outline" className="state-valid">{treeStats.totalRules} rules</Badge>
+                    <Badge variant="outline" className="logic-or">Depth {treeStats.treeDepth}</Badge>
                 </div>
             </div>
 
-            <div className="grid min-h-[560px] min-w-0 gap-4 2xl:grid-cols-[minmax(560px,1.25fr)_minmax(420px,0.75fr)]">
+            <div className="grid min-h-[560px] min-w-0 gap-4 xl:grid-cols-[minmax(520px,1.35fr)_minmax(360px,0.85fr)]">
                 <QueryStructureTree
                     queryTree={queryTree}
                     schema={activeSchema}
@@ -187,13 +175,10 @@ export function QueryBuilder() {
                     onDragEnd={handleDragEnd}
                 />
 
-                <div className="min-h-0 min-w-0 space-y-3">
+                <div className="min-h-0 min-w-0 space-y-3 overflow-hidden">
                     <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-border bg-background/40 px-4 py-3 text-sm text-muted-foreground">
                         {selectedPath.map((item, index) => (
-                            <span
-                                key={`${item}-${index}`}
-                                className="flex items-center gap-2"
-                            >
+                            <span key={`${item}-${index}`} className="flex items-center gap-2">
                                 {index > 0 && <span>/</span>}
                                 <span
                                     className={
