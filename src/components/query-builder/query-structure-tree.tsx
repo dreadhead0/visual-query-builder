@@ -55,8 +55,8 @@ function QueryStructureTreeComponent({
                 type="button"
                 className={
                     selectedNodeId === queryTree.id
-                        ? "tree-group-heading selected-node mb-3 flex w-full min-w-0 items-center gap-2 rounded-xl border-l-2 px-2 py-2 text-left"
-                        : "tree-group-heading mb-3 flex w-full min-w-0 items-center gap-2 rounded-xl border-l-2 border-transparent px-2 py-2 text-left transition-colors"
+                        ? "tree-group-heading selected-node mb-3 flex min-w-[680px] items-center gap-2 rounded-xl border-l-2 px-2 py-2 text-left"
+                        : "tree-group-heading mb-3 flex min-w-[680px] items-center gap-2 rounded-xl border-l-2 border-transparent px-2 py-2 text-left transition-colors"
                 }
                 onClick={() => onSelectNode(queryTree.id)}
             >
@@ -64,9 +64,9 @@ function QueryStructureTreeComponent({
                     {queryTree.combinator}
                 </Badge>
 
-                <span className="truncate font-medium">Root group</span>
+                <span className="whitespace-nowrap font-medium">Root group</span>
 
-                <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">
+                <span className="shrink-0 text-xs text-muted-foreground">
                     {getChildSummary(queryTree.children)}
                 </span>
             </button>
@@ -75,7 +75,7 @@ function QueryStructureTreeComponent({
                 items={queryTree.children.map((child) => child.id)}
                 strategy={verticalListSortingStrategy}
             >
-                <div className="min-w-0 space-y-1">
+                <div className="min-w-max space-y-1">
                     {queryTree.children.map((child) => (
                         <QueryTreeItem
                             key={child.id}
@@ -123,8 +123,8 @@ function QueryStructureTreeComponent({
                 </div>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-3">
-                <div className="min-w-0">
+            <div className="query-tree-scroll min-h-0 flex-1 overflow-auto p-3">
+                <div className="min-w-max pr-8">
                     {isDndReady ? (
                         <DndContext
                             sensors={sensors}

@@ -72,7 +72,7 @@ export function LandingPage() {
             <section className="mx-auto flex min-h-screen w-full max-w-[1500px] flex-col px-3 py-4 sm:px-5 lg:px-8">
                 <nav className="liquid-shell flex items-center justify-between rounded-[2rem] px-4 py-3 sm:px-5">
                     <Link href="/" className="flex items-center gap-2">
-                        <span className="brand-mark flex h-9 w-9 items-center justify-center rounded-2xl border text-sm font-bold">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-[color:var(--accent-primary-border)] bg-transparent text-sm font-bold text-[color:var(--accent-primary)]">
                             QN
                         </span>
 
