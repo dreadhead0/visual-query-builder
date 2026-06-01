@@ -111,6 +111,8 @@ function QueryTreeItemComponent({
 
                             <button
                                 type="button"
+                                data-testid="query-tree-group"
+                                aria-label="Edit nested group"
                                 className="flex min-w-0 flex-1 items-center gap-2 text-left"
                                 onClick={() => onSelectNode(node.id)}
                             >
