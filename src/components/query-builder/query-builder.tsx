@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { DragEndEvent } from "@dnd-kit/core";
 
 import {
@@ -80,6 +80,25 @@ export function QueryBuilder() {
         [activeSchema, queryTree, selectedNode.id],
     );
 
+    useEffect(() => {
+        function handleExternalSelect(event: Event) {
+            const customEvent = event as CustomEvent<{ nodeId?: string }>;
+            const nextNodeId = customEvent.detail?.nodeId;
+
+            if (!nextNodeId || !findNodeById(queryTree, nextNodeId)) {
+                return;
+            }
+
+            setSelectedNodeId(nextNodeId);
+        }
+
+        window.addEventListener("querynest:select-node", handleExternalSelect);
+
+        return () => {
+            window.removeEventListener("querynest:select-node", handleExternalSelect);
+        };
+    }, [queryTree]);
+
     const handleSelectNode = useCallback((nodeId: string) => {
         setSelectedNodeId(nodeId);
     }, []);
@@ -136,12 +155,12 @@ export function QueryBuilder() {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline">
+                    <Badge variant="outline" className="accent-primary-soft">
                         {treeStats.totalGroups} nested group
                         {treeStats.totalGroups === 1 ? "" : "s"}
                     </Badge>
-                    <Badge variant="outline">{treeStats.totalRules} rules</Badge>
-                    <Badge variant="outline">Depth {treeStats.treeDepth}</Badge>
+                    <Badge variant="outline" className="state-valid">{treeStats.totalRules} rules</Badge>
+                    <Badge variant="outline" className="logic-or">Depth {treeStats.treeDepth}</Badge>
                 </div>
             </div>
 

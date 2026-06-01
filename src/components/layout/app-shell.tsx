@@ -122,19 +122,36 @@ export function AppShell() {
                                         Landing
                                     </Link>
                                 </Button>
+                                <Badge
+                                    variant="outline"
+                                    className="min-h-7 rounded-full border border-[#2f2f2f] bg-transparent px-3 py-1.5 text-xs text-foreground hover:bg-transparent"
+                                >
+                                    QueryNest Workspace
+                                </Badge>
 
-                                <Badge variant="secondary">Builder Workspace</Badge>
-                                <Badge variant="outline">{activeSchema.label} schema</Badge>
+                                <Badge
+                                    variant="outline"
+                                    className="min-h-7 rounded-full border border-[#2f2f2f] bg-transparent px-3 py-1.5 text-xs text-foreground hover:bg-transparent"
+                                >
+                                    Visual Query Builder
+                                </Badge>
+
+                                <Badge
+                                    variant="outline"
+                                    className="min-h-7 rounded-full border border-[#2f2f2f] bg-transparent px-3 py-1.5 text-xs text-foreground hover:bg-transparent"
+                                >
+                                    {activeSchema.label} schema
+                                </Badge>
                             </div>
 
                             <div>
                                 <h1 className="text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
-                                    Visual Query Builder
+                                    QueryNest
                                 </h1>
 
                                 <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
-                                    Choose a schema, build rules, preview the generated
-                                    query, then run it against mock records.
+                                    A visual query builder for nesting filters, previewing JSON,
+                                    validating inputs, and running mock records.
                                 </p>
                             </div>
                         </div>
@@ -143,18 +160,26 @@ export function AppShell() {
                             <div className="flex flex-wrap gap-2 xl:justify-end">
                                 <QueryJsonActions onImportSuccess={resetExecutionState} />
                                 <ThemeToggle />
-                                <Button variant="outline" onClick={handleOpenShortcuts}>
+                                <Button
+                                    variant="outline"
+                                    className="accent-action"
+                                    onClick={handleOpenShortcuts}
+                                >
                                     Shortcuts
                                 </Button>
-                                <Button variant="outline" onClick={handleResetQuery}>
+                                <Button
+                                    variant="outline"
+                                    className="button-neutral !text-[color:var(--accent-warning)] hover:!text-[color:var(--accent-warning)]"
+                                    onClick={handleResetQuery}
+                                >
                                     Reset
                                 </Button>
                             </div>
 
-                            <div className="mt-3">
+                            <div className="mt-3 flex flex-col items-start gap-2 text-left">
                                 <Button
                                     size="lg"
-                                    className="w-full"
+                                    className="accent-cta w-full max-w-[230px] justify-center"
                                     disabled={!validation.isValid || isRunning}
                                     onClick={handleRunQuery}
                                 >
@@ -162,7 +187,7 @@ export function AppShell() {
                                     {isRunning ? "Running query..." : "Run Query"}
                                 </Button>
 
-                                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                                <p className="max-w-[280px] text-left text-xs leading-5 text-muted-foreground">
                                     The run button unlocks once every rule is valid.
                                 </p>
                             </div>

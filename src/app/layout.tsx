@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Visual Query Builder",
+  title: "QueryNest",
   description:
-    "A schema-driven visual query builder with nested conditions, live query preview, validation, and mock execution.",
+    "A schema-driven QueryNest visual query builder with nested conditions, live query preview, validation, and mock execution.",
 };
 
 export default function RootLayout({

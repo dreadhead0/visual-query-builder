@@ -168,15 +168,15 @@ export function QueryResults({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="outline">{execution.total} results</Badge>
-                    <Badge variant="outline">Virtualized rows</Badge>
+                    <Badge variant="outline" className="accent-primary-soft">{execution.total} results</Badge>
+                    <Badge variant="outline" className="state-valid">Virtualized rows</Badge>
 
                     <Select
                         name="results-sort-field"
                         value={sortField ?? ""}
                         onValueChange={handleSortFieldChange}
                     >
-                        <SelectTrigger className="w-[160px]">
+                        <SelectTrigger className="accent-action w-[160px]">
                             <SelectValue placeholder="Sort field" />
                         </SelectTrigger>
 
@@ -193,6 +193,7 @@ export function QueryResults({
                         type="button"
                         variant="outline"
                         size="sm"
+                        className="accent-action"
                         onClick={handleToggleSortDirection}
                     >
                         <ArrowDownUp className="mr-2 h-4 w-4" />
@@ -252,7 +253,7 @@ export function QueryResults({
                                         return (
                                             <tr
                                                 key={getRecordKey(record, actualIndex)}
-                                                className="border-b border-border transition-colors last:border-b-0 hover:bg-muted/40"
+                                                className="result-row border-b border-border transition-colors last:border-b-0"
                                                 style={{ height: ROW_HEIGHT }}
                                             >
                                                 {executedSchema?.fields.map((field) => (
@@ -293,6 +294,7 @@ export function QueryResults({
                                 type="button"
                                 variant="outline"
                                 size="sm"
+                                className="result-action"
                                 disabled={safePage === 1}
                                 onClick={handlePreviousPage}
                             >
@@ -304,6 +306,7 @@ export function QueryResults({
                                 type="button"
                                 variant="outline"
                                 size="sm"
+                                className="result-action"
                                 disabled={safePage === totalPages}
                                 onClick={handleNextPage}
                             >

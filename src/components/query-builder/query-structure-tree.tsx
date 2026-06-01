@@ -19,10 +19,7 @@ import { FolderTree } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-    type DataSchema,
-    type GroupNode,
-} from "@/features/query-builder";
+import { type DataSchema, type GroupNode } from "@/features/query-builder";
 import { getChildSummary } from "./query-builder-helpers";
 import { QueryTreeItem } from "./query-tree-item";
 
@@ -58,12 +55,12 @@ function QueryStructureTreeComponent({
                 type="button"
                 className={
                     selectedNodeId === queryTree.id
-                        ? "mb-3 flex w-full min-w-0 items-center gap-2 border-l-2 border-primary bg-primary/10 px-2 py-2 text-left"
-                        : "mb-3 flex w-full min-w-0 items-center gap-2 border-l-2 border-transparent px-2 py-2 text-left transition-colors hover:border-border hover:bg-muted/25"
+                        ? "tree-group-heading selected-node mb-3 flex w-full min-w-0 items-center gap-2 rounded-xl border-l-2 px-2 py-2 text-left"
+                        : "tree-group-heading mb-3 flex w-full min-w-0 items-center gap-2 rounded-xl border-l-2 border-transparent px-2 py-2 text-left transition-colors"
                 }
                 onClick={() => onSelectNode(queryTree.id)}
             >
-                <Badge variant="default" className="shrink-0">
+                <Badge variant="outline" className="logic-and shrink-0">
                     {queryTree.combinator}
                 </Badge>
 
@@ -101,7 +98,9 @@ function QueryStructureTreeComponent({
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <div className="flex items-center gap-2">
-                            <FolderTree className="h-4 w-4" />
+                            <span className="accent-primary-soft flex h-8 w-8 items-center justify-center rounded-xl border">
+                                <FolderTree className="h-4 w-4" />
+                            </span>
                             <p className="text-sm font-semibold tracking-tight">
                                 Query Structure
                             </p>
@@ -116,6 +115,7 @@ function QueryStructureTreeComponent({
                         type="button"
                         variant="outline"
                         size="sm"
+                        className="h-9 rounded-full border border-[#333333] bg-transparent px-3 text-[color:var(--accent-primary)] hover:border-[#333333] hover:bg-transparent hover:text-[color:var(--accent-primary)]"
                         onClick={() => onSelectNode(queryTree.id)}
                     >
                         Root
@@ -123,8 +123,8 @@ function QueryStructureTreeComponent({
                 </div>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-auto p-3">
-                <div className="min-w-[620px]">
+            <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-3">
+                <div className="min-w-0">
                     {isDndReady ? (
                         <DndContext
                             sensors={sensors}
