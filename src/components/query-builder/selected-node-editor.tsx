@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,10 @@ type SelectedNodeEditorProps = {
     onToggleCollapsed: (groupId: string) => void;
 };
 
+function getLogicClass(combinator: LogicalOperator) {
+    return combinator === "AND" ? "logic-and" : "logic-or";
+}
+
 function SelectedNodeEditorComponent({
     node,
     rootGroupId,
@@ -60,7 +64,7 @@ function SelectedNodeEditorComponent({
         return (
             <section
                 data-testid="selected-rule-editor"
-                className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-background/40"
+                className="liquid-readable flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl"
             >
                 <div className="border-b border-border p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -77,6 +81,7 @@ function SelectedNodeEditorComponent({
                             type="button"
                             variant="outline"
                             size="sm"
+                            className="button-primary"
                             onClick={() => onSelectNode(rootGroupId)}
                         >
                             Back to root
@@ -101,7 +106,7 @@ function SelectedNodeEditorComponent({
     return (
         <section
             data-testid="selected-group-editor"
-            className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-background/40"
+            className="liquid-readable flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl"
         >
             <div className="border-b border-border p-4">
                 <div className="flex flex-col gap-4">
@@ -109,14 +114,16 @@ function SelectedNodeEditorComponent({
                         <div className="space-y-2">
                             <div className="flex flex-wrap items-center gap-2">
                                 <p className="text-sm font-semibold tracking-tight">
-                                    Editing:{" "}
+                                    Editing: {" "}
                                     {node.id === rootGroupId
                                         ? "Root group"
                                         : "Nested group"}
                                 </p>
 
-                                <Badge variant="secondary">{node.combinator}</Badge>
-                                <Badge variant="outline">
+                                <Badge variant="outline" className={getLogicClass(node.combinator)}>
+                                    {node.combinator}
+                                </Badge>
+                                <Badge variant="outline" className="accent-primary-soft">
                                     {getChildSummary(node.children)}
                                 </Badge>
                             </div>
@@ -133,6 +140,7 @@ function SelectedNodeEditorComponent({
                                 variant="outline"
                                 size="sm"
                                 data-testid="add-rule-button"
+                                className="button-primary"
                                 onClick={() => onAddRule(node.id)}
                             >
                                 <Plus className="mr-2 h-4 w-4" />
@@ -144,6 +152,7 @@ function SelectedNodeEditorComponent({
                                 variant="outline"
                                 size="sm"
                                 data-testid="add-group-button"
+                                className="button-primary"
                                 onClick={() => onAddGroup(node.id)}
                             >
                                 <Plus className="mr-2 h-4 w-4" />
@@ -155,6 +164,7 @@ function SelectedNodeEditorComponent({
                                     type="button"
                                     variant="outline"
                                     size="sm"
+                                    className="button-danger"
                                     onClick={() => onRemoveNode(node.id)}
                                 >
                                     <Trash2 className="mr-2 h-4 w-4" />
@@ -167,11 +177,9 @@ function SelectedNodeEditorComponent({
             </div>
 
             <div className="grid gap-5 p-4">
-                <div className="rounded-xl border border-border bg-background/40 px-3 py-2">
+                <div className={`rounded-xl border px-3 py-2 ${getLogicClass(node.combinator)}`}>
                     <div className="flex items-center justify-between gap-3">
-                        <p className="text-sm font-medium text-muted-foreground">
-                            Logic
-                        </p>
+                        <p className="text-sm font-medium">Logic operator</p>
 
                         <Select
                             name={`${node.id}-combinator`}
@@ -183,7 +191,7 @@ function SelectedNodeEditorComponent({
                                 )
                             }
                         >
-                            <SelectTrigger className="h-8 w-[88px]">
+                            <SelectTrigger className="h-8 w-[88px] bg-background/50">
                                 <SelectValue />
                             </SelectTrigger>
 
@@ -212,17 +220,22 @@ function SelectedNodeEditorComponent({
                             type="button"
                             variant="outline"
                             size="sm"
+                            className={node.collapsed ? "button-success" : "button-primary"}
                             onClick={() => onToggleCollapsed(node.id)}
                         >
+                            {node.collapsed ? (
+                                <ChevronRight className="mr-2 h-4 w-4" />
+                            ) : (
+                                <ChevronDown className="mr-2 h-4 w-4" />
+                            )}
                             {node.collapsed ? "Expand group" : "Collapse group"}
                         </Button>
                     </div>
                 </div>
 
-                <div className="rounded-2xl border border-dashed border-border bg-background/30 p-4 text-sm leading-6 text-muted-foreground">
+                <div className="accent-primary-soft rounded-2xl border border-dashed p-4 text-sm leading-6">
                     Select a rule or nested group from the Query Structure tree to edit
-                    it here. This keeps the editor focused and prevents repeated forms
-                    from crowding the workspace.
+                    it here. The form stays focused, so deep nesting will not crush inputs.
                 </div>
             </div>
         </section>

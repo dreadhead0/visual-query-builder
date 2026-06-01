@@ -46,7 +46,7 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
     }
 
     return (
-        <section className="rounded-2xl border border-border bg-card p-4">
+        <section className="liquid-panel rounded-[1.75rem] p-4">
             <div className="flex flex-col gap-1">
                 <p className="text-sm font-semibold tracking-tight">Query Library</p>
                 <p className="text-sm leading-6 text-muted-foreground">
@@ -55,19 +55,22 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
             </div>
 
             <Tabs defaultValue="history" className="mt-4">
-                <TabsList>
+                <TabsList className="accent-primary-soft">
                     <TabsTrigger value="history">History</TabsTrigger>
                     <TabsTrigger value="presets">Presets</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="history" className="mt-4 space-y-3">
                     <div className="flex items-center justify-between gap-3">
-                        <Badge variant="outline">{queryHistory.length} recent</Badge>
+                        <Badge variant="outline" className="accent-primary-soft">
+                            {queryHistory.length} recent
+                        </Badge>
 
                         <Button
                             type="button"
                             variant="outline"
                             size="sm"
+                            className="button-warning"
                             disabled={queryHistory.length === 0}
                             onClick={clearQueryHistory}
                         >
@@ -76,7 +79,7 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
                     </div>
 
                     {queryHistory.length === 0 ? (
-                        <div className="rounded-xl border border-dashed border-border bg-background p-4 text-sm leading-6 text-muted-foreground">
+                        <div className="liquid-readable rounded-xl border-dashed p-4 text-sm leading-6 text-muted-foreground">
                             Run a valid query and it will appear here automatically.
                         </div>
                     ) : (
@@ -84,11 +87,11 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
                             {queryHistory.map((entry) => (
                                 <div
                                     key={entry.id}
-                                    className="flex flex-col gap-3 rounded-xl border border-border bg-background p-3 sm:flex-row sm:items-center sm:justify-between"
+                                    className="library-card flex flex-col gap-3 rounded-xl border p-3 sm:flex-row sm:items-center sm:justify-between"
                                 >
                                     <div className="min-w-0">
                                         <div className="flex items-center gap-2">
-                                            <Clock className="h-4 w-4" />
+                                            <Clock className="h-4 w-4 icon-primary" />
                                             <p className="text-sm font-medium">
                                                 {formatDateTime(entry.executedAt)}
                                             </p>
@@ -103,6 +106,7 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
                                         type="button"
                                         variant="outline"
                                         size="sm"
+                                        className="button-primary"
                                         onClick={() => {
                                             loadQueryTree(entry.schemaId, entry.queryTree);
                                             onLoadQuery?.();
@@ -117,7 +121,7 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
                 </TabsContent>
 
                 <TabsContent value="presets" className="mt-4 space-y-3">
-                    <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+                    <div className="grid max-w-3xl gap-2 sm:grid-cols-[minmax(240px,520px)_auto]">
                         <div className="space-y-1">
                             <label htmlFor="preset-name" className="text-sm font-medium">
                                 Preset name
@@ -129,6 +133,7 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
                                 value={presetName}
                                 placeholder="Example: Active Nigerian users"
                                 autoComplete="off"
+                                className="liquid-control"
                                 onChange={(event) => setPresetName(event.target.value)}
                             />
                         </div>
@@ -137,6 +142,7 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
                             <Button
                                 type="button"
                                 variant="outline"
+                                className="button-primary"
                                 disabled={presetName.trim() === ""}
                                 onClick={handleSavePreset}
                             >
@@ -147,7 +153,7 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
                     </div>
 
                     {savedPresets.length === 0 ? (
-                        <div className="rounded-xl border border-dashed border-border bg-background p-4 text-sm leading-6 text-muted-foreground">
+                        <div className="liquid-readable rounded-xl border-dashed p-4 text-sm leading-6 text-muted-foreground">
                             No presets yet. Save a query once you have a useful setup.
                         </div>
                     ) : (
@@ -155,7 +161,7 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
                             {savedPresets.map((preset) => (
                                 <div
                                     key={preset.id}
-                                    className="flex flex-col gap-3 rounded-xl border border-border bg-background p-3 sm:flex-row sm:items-center sm:justify-between"
+                                    className="library-card flex flex-col gap-3 rounded-xl border p-3 sm:flex-row sm:items-center sm:justify-between"
                                 >
                                     <div className="min-w-0">
                                         <p className="truncate text-sm font-medium">{preset.name}</p>
@@ -171,6 +177,7 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
                                             type="button"
                                             variant="outline"
                                             size="sm"
+                                            className="button-primary"
                                             onClick={() => {
                                                 loadQueryTree(preset.schemaId, preset.queryTree);
                                                 onLoadQuery?.();
@@ -183,6 +190,7 @@ export function QueryLibrary({ onLoadQuery }: QueryLibraryProps) {
                                             type="button"
                                             variant="outline"
                                             size="sm"
+                                            className="button-danger"
                                             aria-label={`Delete preset ${preset.name}`}
                                             onClick={() => deleteSavedPreset(preset.id)}
                                         >

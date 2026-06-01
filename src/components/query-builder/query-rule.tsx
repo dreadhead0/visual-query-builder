@@ -102,7 +102,7 @@ export function QueryRule({
                     variant="outline"
                     size="sm"
                     aria-label="Remove rule"
-                    className="h-9 w-full justify-center"
+                    className="h-9 w-full justify-center border border-[#333333] bg-transparent text-[color:var(--accent-danger)] hover:border-[#333333] hover:bg-transparent hover:text-[color:var(--accent-danger)]"
                     onClick={() => onRemove(rule.id)}
                 >
                     <Trash2 className="h-4 w-4" />

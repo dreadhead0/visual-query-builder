@@ -24,7 +24,7 @@ export function ThemeToggle() {
 
     if (!isMounted) {
         return (
-            <Button type="button" variant="outline" disabled>
+            <Button type="button" variant="outline" className="button-neutral" disabled>
                 Theme
             </Button>
         );
@@ -36,6 +36,7 @@ export function ThemeToggle() {
         <Button
             type="button"
             variant="outline"
+            className="button-neutral"
             onClick={() => setTheme(isDark ? "light" : "dark")}
             aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
         >

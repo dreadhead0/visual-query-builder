@@ -18,6 +18,10 @@ type DataSourceBarProps = {
     onSchemaChange?: () => void;
 };
 
+function getFieldTypeClass(type: string) {
+    return `field-type-${type}`;
+}
+
 export function DataSourceBar({ onSchemaChange }: DataSourceBarProps) {
     const schemas = useQueryBuilderStore(selectSchemas);
     const activeSchema = useQueryBuilderStore(selectActiveSchema);
@@ -35,7 +39,9 @@ export function DataSourceBar({ onSchemaChange }: DataSourceBarProps) {
                 <div className="space-y-3">
                     <div className="flex items-center justify-between gap-3">
                         <p className="text-sm font-semibold tracking-tight">Data Source</p>
-                        <Badge variant="outline">{schemas.length} schemas</Badge>
+                        <Badge variant="outline" className="accent-primary-soft">
+                            {schemas.length} schemas
+                        </Badge>
                     </div>
 
                     <Select
@@ -43,7 +49,10 @@ export function DataSourceBar({ onSchemaChange }: DataSourceBarProps) {
                         value={activeSchemaId}
                         onValueChange={handleSchemaChange}
                     >
-                        <SelectTrigger data-testid="schema-select-trigger" className="w-full">
+                        <SelectTrigger
+                            data-testid="schema-select-trigger"
+                            className="accent-primary-soft w-full"
+                        >
                             <SelectValue placeholder="Select schema" />
                         </SelectTrigger>
 
@@ -73,7 +82,7 @@ export function DataSourceBar({ onSchemaChange }: DataSourceBarProps) {
                             </p>
                         </div>
 
-                        <Badge variant="secondary">
+                        <Badge variant="secondary" className="accent-primary-soft">
                             {activeSchema.fields.length} fields
                         </Badge>
                     </div>
@@ -82,10 +91,12 @@ export function DataSourceBar({ onSchemaChange }: DataSourceBarProps) {
                         {activeSchema.fields.map((field) => (
                             <div
                                 key={field.name}
-                                className="liquid-readable flex shrink-0 items-center gap-2 rounded-2xl px-3 py-2 text-sm"
+                                className={`liquid-readable ${getFieldTypeClass(field.type)} flex shrink-0 items-center gap-2 rounded-2xl px-3 py-2 text-sm`}
                             >
                                 <span className="font-medium">{field.label}</span>
-                                <Badge variant="outline">{field.type}</Badge>
+                                <Badge variant="outline" className={getFieldTypeClass(field.type)}>
+                                    {field.type}
+                                </Badge>
                             </div>
                         ))}
                     </div>

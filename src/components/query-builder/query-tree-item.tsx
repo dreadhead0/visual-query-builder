@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     type DataSchema,
+    type LogicalOperator,
     type QueryNode,
 } from "@/features/query-builder";
 import { SortableQueryNode } from "./sortable-query-node";
@@ -27,6 +28,26 @@ type QueryTreeItemProps = {
     onToggleCollapsed: (groupId: string) => void;
 };
 
+function getLogicBadgeClass(combinator: LogicalOperator) {
+    return combinator === "AND" ? "logic-and" : "logic-or";
+}
+
+function getLineClass(combinator: LogicalOperator) {
+    return combinator === "AND" ? "tree-line-and" : "tree-line-or";
+}
+
+function getChildIndentClass(depth: number) {
+    if (depth >= 5) {
+        return "ml-1 pl-2";
+    }
+
+    if (depth >= 3) {
+        return "ml-2 pl-2";
+    }
+
+    return "ml-4 pl-3";
+}
+
 function QueryTreeItemComponent({
     node,
     parentGroupId,
@@ -38,10 +59,20 @@ function QueryTreeItemComponent({
 }: QueryTreeItemProps) {
     const isSelected = node.id === selectedNodeId;
     const hasConnector = depth > 0;
+    const connectorClass =
+        node.type === "group"
+            ? node.combinator === "AND"
+                ? "tree-connector-and"
+                : "tree-connector-or"
+            : "tree-connector-neutral";
 
     const treeConnectorClass = hasConnector
-        ? "relative before:absolute before:left-[-0.75rem] before:top-1/2 before:h-px before:w-3 before:bg-border"
+        ? `relative before:absolute before:left-[-0.75rem] before:top-1/2 before:h-px before:w-3 before:border-t ${connectorClass}`
         : "relative";
+
+    const selectedClass = isSelected
+        ? "border-l-2 selected-node"
+        : "border-l-2 border-transparent transition-colors hover:border-border hover:bg-muted/25";
 
     if (node.type === "rule") {
         const summary = getRuleSummary(node, schema);
@@ -54,14 +85,10 @@ function QueryTreeItemComponent({
                         type="button"
                         data-testid="query-tree-rule"
                         aria-label={`Edit rule ${summary.fieldLabel}`}
-                        className={
-                            isSelected
-                                ? "w-full border-l-2 border-primary bg-primary/10 px-2 py-1.5 text-left"
-                                : "w-full border-l-2 border-transparent px-2 py-1.5 text-left transition-colors hover:border-border hover:bg-muted/25"
-                        }
+                        className={`w-full rounded-xl px-2 py-1.5 text-left ${selectedClass}`}
                         onClick={() => onSelectNode(node.id)}
                     >
-                        <div className="grid min-w-0 gap-2 text-sm sm:grid-cols-[minmax(120px,1fr)_minmax(90px,0.65fr)_minmax(120px,1fr)] sm:items-center">
+                        <div className="grid min-w-0 gap-2 text-sm sm:grid-cols-[minmax(110px,1fr)_minmax(80px,0.6fr)_minmax(100px,0.8fr)] sm:items-center">
                             <span className="truncate font-medium">
                                 {summary.fieldLabel}
                             </span>
@@ -70,7 +97,7 @@ function QueryTreeItemComponent({
                                 {summary.operatorLabel}
                             </span>
 
-                            <span className="truncate text-muted-foreground">
+                            <span className={value === "No value" ? "truncate text-muted-foreground" : "truncate text-foreground"}>
                                 {value}
                             </span>
                         </div>
@@ -80,26 +107,22 @@ function QueryTreeItemComponent({
         );
     }
 
+    const groupLineClass = getLineClass(node.combinator);
+
     return (
         <div className="relative min-w-0">
             <div className={treeConnectorClass}>
                 <SortableQueryNode id={node.id} parentGroupId={parentGroupId}>
-                    <div
-                        className={
-                            isSelected
-                                ? "border-l-2 border-primary bg-primary/10 px-2 py-1.5"
-                                : "border-l-2 border-transparent px-2 py-1.5 transition-colors hover:border-border hover:bg-muted/25"
-                        }
-                    >
+                    <div className={`tree-group-heading rounded-xl px-2 py-1.5 ${selectedClass}`}>
                         <div className="flex min-w-0 items-center gap-2">
                             <Button
                                 type="button"
-                                variant="ghost"
+                                variant="outline"
                                 size="icon-xs"
                                 aria-label={
                                     node.collapsed ? "Expand group" : "Collapse group"
                                 }
-                                className="shrink-0"
+                                className={`${getLogicBadgeClass(node.combinator)} shrink-0`}
                                 onClick={() => onToggleCollapsed(node.id)}
                             >
                                 {node.collapsed ? (
@@ -116,7 +139,10 @@ function QueryTreeItemComponent({
                                 className="flex min-w-0 flex-1 items-center gap-2 text-left"
                                 onClick={() => onSelectNode(node.id)}
                             >
-                                <Badge variant="secondary" className="shrink-0">
+                                <Badge
+                                    variant="outline"
+                                    className={`shrink-0 ${getLogicBadgeClass(node.combinator)}`}
+                                >
                                     {node.combinator}
                                 </Badge>
 
@@ -124,7 +150,7 @@ function QueryTreeItemComponent({
                                     Nested group
                                 </span>
 
-                                <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">
+                                <span className="hidden shrink-0 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground sm:inline">
                                     {getChildSummary(node.children)}
                                 </span>
                             </button>
@@ -138,7 +164,7 @@ function QueryTreeItemComponent({
                     items={node.children.map((child) => child.id)}
                     strategy={verticalListSortingStrategy}
                 >
-                    <div className="relative ml-4 min-w-0 space-y-1 border-l border-border/70 pl-3">
+                    <div className={`relative min-w-0 space-y-1 border-l ${groupLineClass} ${getChildIndentClass(depth)}`}>
                         {node.children.map((child) => (
                             <QueryTreeItem
                                 key={child.id}

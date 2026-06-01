@@ -75,7 +75,7 @@ test.describe("Visual Query Builder browser flows", () => {
     test("loads the builder with preview, validation, and disabled execution", async ({
         page,
     }) => {
-        await expect(page.getByText("Visual Query Builder")).toBeVisible();
+        await expect(page.getByRole("heading", { name: "QueryNest" })).toBeVisible();
         await expect(page.getByText("Data Source")).toBeVisible();
         await expect(page.getByText("Query Builder Canvas")).toBeVisible();
         await expect(page.getByText("Live Query Preview")).toBeVisible();
