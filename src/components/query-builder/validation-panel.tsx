@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 import {
@@ -13,7 +14,11 @@ import { Badge } from "@/components/ui/badge";
 export function ValidationPanel() {
     const activeSchema = useQueryBuilderStore(selectActiveSchema);
     const queryTree = useQueryBuilderStore(selectQueryTree);
-    const validation = validateQueryTree(queryTree, activeSchema);
+
+    const validation = useMemo(
+        () => validateQueryTree(queryTree, activeSchema),
+        [activeSchema, queryTree],
+    );
 
     if (validation.isValid) {
         return (

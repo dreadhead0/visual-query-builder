@@ -12,3 +12,7 @@ export * from "./query-json-actions";
 export * from "./keyboard-shortcuts-dialog";
 export * from "./use-keyboard-shortcuts";
 export * from "./sortable-query-node";
+export * from "./query-builder-helpers";
+export * from "./query-structure-tree";
+export * from "./query-tree-item";
+export * from "./selected-node-editor";

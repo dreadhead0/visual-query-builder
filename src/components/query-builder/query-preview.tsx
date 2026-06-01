@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Copy } from "lucide-react";
 
 import {
@@ -14,8 +15,16 @@ import { Button } from "@/components/ui/button";
 export function QueryPreview() {
     const activeSchema = useQueryBuilderStore(selectActiveSchema);
     const queryTree = useQueryBuilderStore(selectQueryTree);
-    const preview = formatMongoQueryPreview(queryTree, activeSchema);
-    const validation = validateQueryTree(queryTree, activeSchema);
+
+    const preview = useMemo(
+        () => formatMongoQueryPreview(queryTree, activeSchema),
+        [activeSchema, queryTree],
+    );
+
+    const validation = useMemo(
+        () => validateQueryTree(queryTree, activeSchema),
+        [activeSchema, queryTree],
+    );
 
     async function handleCopyPreview() {
         await navigator.clipboard.writeText(preview);
