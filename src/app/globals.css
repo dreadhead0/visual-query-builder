@@ -707,6 +707,35 @@ select {
   .library-card:hover {
     border-color: color-mix(in oklch, var(--accent-primary) 38%, transparent);
   }
+
+  .query-tree-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklch, var(--accent-primary) 58%, transparent) transparent;
+    overscroll-behavior: contain;
+  }
+
+  .query-tree-scroll::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  .query-tree-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .query-tree-scroll::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--accent-primary) 52%, transparent);
+  }
+
+  .query-tree-scroll::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklch, var(--accent-primary) 72%, transparent);
+  }
+
+  .query-tree-scroll::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {

@@ -38,14 +38,14 @@ function getLineClass(combinator: LogicalOperator) {
 
 function getChildIndentClass(depth: number) {
     if (depth >= 5) {
-        return "ml-1 pl-2";
+        return "ml-0.5 pl-1.5";
     }
 
     if (depth >= 3) {
-        return "ml-2 pl-2";
+        return "ml-1 pl-1.5";
     }
 
-    return "ml-4 pl-3";
+    return "ml-2 pl-2";
 }
 
 function QueryTreeItemComponent({
@@ -85,19 +85,19 @@ function QueryTreeItemComponent({
                         type="button"
                         data-testid="query-tree-rule"
                         aria-label={`Edit rule ${summary.fieldLabel}`}
-                        className={`w-full rounded-xl px-2 py-1.5 text-left ${selectedClass}`}
+                        className={`min-w-[680px] rounded-xl px-2 py-1.5 text-left ${selectedClass}`}
                         onClick={() => onSelectNode(node.id)}
                     >
-                        <div className="grid min-w-0 gap-2 text-sm sm:grid-cols-[minmax(110px,1fr)_minmax(80px,0.6fr)_minmax(100px,0.8fr)] sm:items-center">
-                            <span className="truncate font-medium">
+                        <div className="grid min-w-[640px] grid-cols-[180px_150px_260px] items-center gap-4 text-sm">
+                            <span className="whitespace-nowrap font-medium">
                                 {summary.fieldLabel}
                             </span>
 
-                            <span className="truncate text-muted-foreground">
+                            <span className="whitespace-nowrap text-muted-foreground">
                                 {summary.operatorLabel}
                             </span>
 
-                            <span className={value === "No value" ? "truncate text-muted-foreground" : "truncate text-foreground"}>
+                            <span className={value === "No value" ? "whitespace-nowrap text-muted-foreground" : "whitespace-nowrap text-foreground"}>
                                 {value}
                             </span>
                         </div>
@@ -110,11 +110,11 @@ function QueryTreeItemComponent({
     const groupLineClass = getLineClass(node.combinator);
 
     return (
-        <div className="relative min-w-0">
+        <div className="relative min-w-max">
             <div className={treeConnectorClass}>
                 <SortableQueryNode id={node.id} parentGroupId={parentGroupId}>
-                    <div className={`tree-group-heading rounded-xl px-2 py-1.5 ${selectedClass}`}>
-                        <div className="flex min-w-0 items-center gap-2">
+                    <div className={`tree-group-heading min-w-[680px] rounded-xl px-2 py-1.5 ${selectedClass}`}>
+                        <div className="flex min-w-[640px] items-center gap-2">
                             <Button
                                 type="button"
                                 variant="outline"
@@ -136,7 +136,7 @@ function QueryTreeItemComponent({
                                 type="button"
                                 data-testid="query-tree-group"
                                 aria-label="Edit nested group"
-                                className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                                className="flex min-w-max flex-1 items-center gap-2 text-left"
                                 onClick={() => onSelectNode(node.id)}
                             >
                                 <Badge
@@ -146,11 +146,11 @@ function QueryTreeItemComponent({
                                     {node.combinator}
                                 </Badge>
 
-                                <span className="truncate text-sm font-medium">
+                                <span className="whitespace-nowrap text-sm font-medium">
                                     Nested group
                                 </span>
 
-                                <span className="hidden shrink-0 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground sm:inline">
+                                <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
                                     {getChildSummary(node.children)}
                                 </span>
                             </button>
@@ -164,7 +164,7 @@ function QueryTreeItemComponent({
                     items={node.children.map((child) => child.id)}
                     strategy={verticalListSortingStrategy}
                 >
-                    <div className={`relative min-w-0 space-y-1 border-l ${groupLineClass} ${getChildIndentClass(depth)}`}>
+                    <div className={`relative min-w-max space-y-1 border-l ${groupLineClass} ${getChildIndentClass(depth)}`}>
                         {node.children.map((child) => (
                             <QueryTreeItem
                                 key={child.id}
