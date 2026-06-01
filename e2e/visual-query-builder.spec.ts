@@ -210,4 +210,32 @@ test.describe("Visual Query Builder browser flows", () => {
             page.getByRole("button", { name: "Drag to reorder" }),
         ).toHaveCount(2);
     });
+
+    test("collapses and expands a nested group from the editor", async ({ page }) => {
+        await page.keyboard.press("Control+Shift+G");
+
+        await expect(page.getByText(/1\s*nested group/i)).toBeVisible();
+
+        const nestedGroupNode = page.getByTestId("query-tree-group").first();
+
+        await expect(nestedGroupNode).toBeVisible();
+
+        await nestedGroupNode.click();
+
+        const groupEditor = page.getByTestId("selected-group-editor");
+
+        await expect(groupEditor).toBeVisible();
+
+        await groupEditor.getByRole("button", { name: "Collapse group" }).click();
+
+        await expect(
+            groupEditor.getByRole("button", { name: "Expand group" }),
+        ).toBeVisible();
+
+        await groupEditor.getByRole("button", { name: "Expand group" }).click();
+
+        await expect(
+            groupEditor.getByRole("button", { name: "Collapse group" }),
+        ).toBeVisible();
+    });
 });

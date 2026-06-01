@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 
@@ -7,6 +7,7 @@ import { useQueryBuilderStore } from "@/features/query-builder";
 
 describe("QueryBuilder", () => {
     beforeEach(() => {
+        useQueryBuilderStore.getState().setActiveSchema("users");
         useQueryBuilderStore.getState().resetQuery();
     });
 
@@ -51,6 +52,74 @@ describe("QueryBuilder", () => {
         });
 
         await user.click(addGroupButtons[0]);
+
         expect(screen.getByText(/1\s*nested group/i)).toBeInTheDocument();
+        expect(screen.getByText(/depth\s*3/i)).toBeInTheDocument();
+    });
+
+    it("collapses and expands a selected nested group", async () => {
+        const user = userEvent.setup();
+
+        render(<QueryBuilder />);
+
+        await user.click(screen.getByRole("button", { name: /back to root/i }));
+
+        const addGroupButtons = screen.getAllByRole("button", {
+            name: /add group/i,
+        });
+
+        await user.click(addGroupButtons[0]);
+
+        await user.click(screen.getByText("Nested group"));
+
+        const groupEditor = screen.getByTestId("selected-group-editor");
+
+        expect(groupEditor).toBeInTheDocument();
+
+        await user.click(
+            within(groupEditor).getByRole("button", {
+                name: /collapse group/i,
+            }),
+        );
+
+        expect(
+            within(groupEditor).getByRole("button", {
+                name: /expand group/i,
+            }),
+        ).toBeInTheDocument();
+
+        await user.click(
+            within(groupEditor).getByRole("button", {
+                name: /expand group/i,
+            }),
+        );
+
+        expect(
+            within(groupEditor).getByRole("button", {
+                name: /collapse group/i,
+            }),
+        ).toBeInTheDocument();
+    });
+
+    it("shows reorder drag handles for same-parent sibling nodes", async () => {
+        const user = userEvent.setup();
+
+        render(<QueryBuilder />);
+
+        expect(
+            screen.getAllByRole("button", { name: "Drag to reorder" }),
+        ).toHaveLength(1);
+
+        await user.click(screen.getByRole("button", { name: /back to root/i }));
+
+        const addRuleButtons = screen.getAllByRole("button", {
+            name: /add rule/i,
+        });
+
+        await user.click(addRuleButtons[0]);
+
+        expect(
+            screen.getAllByRole("button", { name: "Drag to reorder" }),
+        ).toHaveLength(2);
     });
 });

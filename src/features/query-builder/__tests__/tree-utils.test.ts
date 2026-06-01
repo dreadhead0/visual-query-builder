@@ -24,6 +24,14 @@ const secondRule: RuleNode = {
     value: "18",
 };
 
+const thirdRule: RuleNode = {
+    id: "rule_third",
+    type: "rule",
+    field: "country",
+    operator: "equals",
+    value: "Nigeria",
+};
+
 describe("tree utilities", () => {
     it("counts rules, groups, and depth recursively", () => {
         const tree: GroupNode = {
@@ -66,7 +74,7 @@ describe("tree utilities", () => {
         expect(tree.children).toHaveLength(1);
     });
 
-    it("reorders children inside a group", () => {
+    it("reorders children inside the root group", () => {
         const tree: GroupNode = {
             id: "group_root",
             type: "group",
@@ -85,5 +93,54 @@ describe("tree utilities", () => {
             "rule_second",
             "rule_first",
         ]);
+    });
+
+    it("reorders children inside a nested group without changing other groups", () => {
+        const tree: GroupNode = {
+            id: "group_root",
+            type: "group",
+            combinator: "AND",
+            collapsed: false,
+            children: [
+                firstRule,
+                {
+                    id: "group_nested",
+                    type: "group",
+                    combinator: "OR",
+                    collapsed: false,
+                    children: [secondRule, thirdRule],
+                },
+            ],
+        };
+
+        const updatedTree = reorderChildrenInGroup(tree, {
+            parentGroupId: "group_nested",
+            activeId: "rule_third",
+            overId: "rule_second",
+        }) as GroupNode;
+
+        expect(updatedTree.children[0]).toEqual(firstRule);
+
+        const nestedGroup = updatedTree.children[1];
+
+        expect(nestedGroup.type).toBe("group");
+
+        if (nestedGroup.type === "group") {
+            expect(nestedGroup.children.map((child) => child.id)).toEqual([
+                "rule_third",
+                "rule_second",
+            ]);
+        }
+
+        const originalNestedGroup = tree.children[1];
+
+        expect(originalNestedGroup.type).toBe("group");
+
+        if (originalNestedGroup.type === "group") {
+            expect(originalNestedGroup.children.map((child) => child.id)).toEqual([
+                "rule_second",
+                "rule_third",
+            ]);
+        }
     });
 });
