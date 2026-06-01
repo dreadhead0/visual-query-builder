@@ -122,6 +122,7 @@ export function AppShell() {
                                         Landing
                                     </Link>
                                 </Button>
+
                                 <Badge
                                     variant="outline"
                                     className="min-h-7 rounded-full border border-[#2f2f2f] bg-transparent px-3 py-1.5 text-xs text-foreground hover:bg-transparent"
@@ -160,6 +161,7 @@ export function AppShell() {
                             <div className="flex flex-wrap gap-2 xl:justify-end">
                                 <QueryJsonActions onImportSuccess={resetExecutionState} />
                                 <ThemeToggle />
+
                                 <Button
                                     variant="outline"
                                     className="accent-action"
@@ -167,6 +169,7 @@ export function AppShell() {
                                 >
                                     Shortcuts
                                 </Button>
+
                                 <Button
                                     variant="outline"
                                     className="button-neutral !text-[color:var(--accent-warning)] hover:!text-[color:var(--accent-warning)]"
@@ -198,12 +201,12 @@ export function AppShell() {
                 <div className="grid gap-4 py-5">
                     <DataSourceBar onSchemaChange={handleSchemaChange} />
 
-                    <div className="grid min-h-[620px] gap-4 xl:grid-cols-[minmax(0,1fr)_400px]">
+                    <div className="grid min-h-[620px] gap-4 xl:grid-cols-[minmax(0,1fr)_365px] 2xl:grid-cols-[minmax(0,1fr)_385px]">
                         <section className="liquid-panel min-w-0 rounded-[1.75rem] p-4">
                             <QueryBuilder />
                         </section>
 
-                        <aside className="liquid-panel space-y-4 rounded-[1.75rem] p-4 xl:sticky xl:top-4 xl:self-start">
+                        <aside className="liquid-panel space-y-4 rounded-[1.75rem] p-3 xl:sticky xl:top-4 xl:self-start 2xl:p-4">
                             <QueryPreview />
                             <ValidationPanel />
                         </aside>
