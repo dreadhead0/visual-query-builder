@@ -17,6 +17,7 @@ async function openFirstRuleEditor(page: Page) {
     await expect(page.getByTestId("rule-field-trigger").first()).toBeVisible();
     await expect(page.getByTestId("rule-operator-trigger").first()).toBeVisible();
 }
+
 async function selectRadixOption(
     page: Page,
     triggerTestId: string,
@@ -43,6 +44,24 @@ async function expectRuleCount(page: Page, count: number) {
     await expect(
         page.getByText(`${count} rules`, { exact: true }).first(),
     ).toBeVisible();
+}
+
+async function importQueryJson(page: Page, payload: unknown) {
+    await page.getByTestId("import-json-button").click();
+
+    const dialog = page.getByTestId("import-json-dialog");
+
+    await expect(dialog).toBeVisible();
+
+    await page
+        .getByTestId("import-json-textarea")
+        .fill(JSON.stringify(payload, null, 2));
+
+    await dialog
+        .getByRole("button", { name: "Import Query", exact: true })
+        .click();
+
+    await expect(dialog).not.toBeVisible();
 }
 
 test.describe("Landing page", () => {
@@ -237,5 +256,345 @@ test.describe("Visual Query Builder browser flows", () => {
         await expect(
             groupEditor.getByRole("button", { name: "Collapse group" }),
         ).toBeVisible();
+    });
+
+    test("handles very deep nested groups without breaking the builder", async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1366, height: 900 });
+
+        const deepNestedQuery = {
+            version: 1,
+            schemaId: "users",
+            queryTree: {
+                id: "group_root_deep_test",
+                type: "group",
+                combinator: "AND",
+                collapsed: false,
+                children: [
+                    {
+                        id: "group_depth_1",
+                        type: "group",
+                        combinator: "AND",
+                        collapsed: false,
+                        children: [
+                            {
+                                id: "group_depth_2",
+                                type: "group",
+                                combinator: "AND",
+                                collapsed: false,
+                                children: [
+                                    {
+                                        id: "group_depth_3",
+                                        type: "group",
+                                        combinator: "AND",
+                                        collapsed: false,
+                                        children: [
+                                            {
+                                                id: "group_depth_4",
+                                                type: "group",
+                                                combinator: "AND",
+                                                collapsed: false,
+                                                children: [
+                                                    {
+                                                        id: "group_depth_5",
+                                                        type: "group",
+                                                        combinator: "AND",
+                                                        collapsed: false,
+                                                        children: [
+                                                            {
+                                                                id: "group_depth_6",
+                                                                type: "group",
+                                                                combinator: "AND",
+                                                                collapsed: false,
+                                                                children: [
+                                                                    {
+                                                                        id: "rule_deep_age",
+                                                                        type: "rule",
+                                                                        field: "age",
+                                                                        operator: "greaterThan",
+                                                                        value: 18,
+                                                                    },
+                                                                ],
+                                                            },
+                                                        ],
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+        };
+
+        await importQueryJson(page, deepNestedQuery);
+
+        await expect(page.getByText(/Depth 8/i)).toBeVisible();
+        await expect(page.getByText(/1 rules/i).first()).toBeVisible();
+        await expect(page.getByText(/Query is valid/i)).toBeVisible();
+
+        const queryStructure = page
+            .getByText("Query Structure")
+            .locator("xpath=ancestor::section[1]");
+
+        await expect(queryStructure).toBeVisible();
+
+        const treeScroll = queryStructure.locator(".query-tree-scroll");
+
+        await expect(treeScroll).toBeVisible();
+
+        const hasHorizontalScroll = await treeScroll.evaluate((element) => {
+            return element.scrollWidth > element.clientWidth;
+        });
+
+        expect(hasHorizontalScroll).toBeTruthy();
+
+        await treeScroll.evaluate((element) => {
+            element.scrollLeft = element.scrollWidth;
+        });
+
+        await expect(page.getByText("Age").first()).toBeVisible();
+        await expect(page.getByText("Greater than").first()).toBeVisible();
+
+        const lastNestedGroup = page.getByTestId("query-tree-group").last();
+
+        await lastNestedGroup.click();
+
+        const groupEditor = page.getByTestId("selected-group-editor");
+
+        await expect(groupEditor).toBeVisible();
+
+        await groupEditor.getByRole("button", { name: "Collapse group" }).click();
+        await expect(
+            groupEditor.getByRole("button", { name: "Expand group" }),
+        ).toBeVisible();
+
+        await groupEditor.getByRole("button", { name: "Expand group" }).click();
+        await expect(
+            groupEditor.getByRole("button", { name: "Collapse group" }),
+        ).toBeVisible();
+
+        await expect(page.getByRole("button", { name: /Run Query/i })).toBeEnabled();
+    });
+
+    test("handles many rules in one group and still executes the query", async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1366, height: 900 });
+
+        const ruleTemplates = [
+            {
+                field: "name",
+                operator: "contains",
+                value: "a",
+            },
+            {
+                field: "email",
+                operator: "contains",
+                value: "example",
+            },
+            {
+                field: "age",
+                operator: "greaterThan",
+                value: 18,
+            },
+            {
+                field: "purchases",
+                operator: "greaterThan",
+                value: 5,
+            },
+            {
+                field: "status",
+                operator: "equals",
+                value: "active",
+            },
+            {
+                field: "country",
+                operator: "equals",
+                value: "Nigeria",
+            },
+            {
+                field: "isVerified",
+                operator: "equals",
+                value: true,
+            },
+        ];
+
+        const manyRules = Array.from({ length: 25 }, (_, index) => {
+            const template = ruleTemplates[index % ruleTemplates.length];
+
+            return {
+                id: `rule_many_${index + 1}`,
+                type: "rule",
+                field: template.field,
+                operator: template.operator,
+                value: template.value,
+            };
+        });
+
+        const manyRulesQuery = {
+            version: 1,
+            schemaId: "users",
+            queryTree: {
+                id: "group_root_many_rules_test",
+                type: "group",
+                combinator: "OR",
+                collapsed: false,
+                children: manyRules,
+            },
+        };
+
+        await importQueryJson(page, manyRulesQuery);
+
+        await expect(page.getByText(/25 rules/i).first()).toBeVisible();
+        await expect(page.getByText(/Query is valid/i)).toBeVisible();
+
+        await expect(page.getByText("Name").first()).toBeVisible();
+        await expect(page.getByText("Email").first()).toBeVisible();
+        await expect(page.getByText("Age").first()).toBeVisible();
+
+        await expect(page.getByRole("button", { name: /Run Query/i })).toBeEnabled();
+
+        await page.getByRole("button", { name: /Run Query/i }).click();
+
+        await expect(page.getByText(/Execution Results/i)).toBeVisible();
+        await expect(
+            page.getByText("Showing records from the Users mock dataset."),
+        ).toBeVisible();
+        await expect(page.getByText(/results/i).first()).toBeVisible();
+
+        await page.getByRole("button", { name: /ASC/i }).click();
+
+        await expect(page.getByRole("button", { name: /DESC/i })).toBeVisible();
+    });
+
+    test("handles multiple rules and nested groups with mixed logic", async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1366, height: 900 });
+
+        const mixedGroupQuery = {
+            version: 1,
+            schemaId: "users",
+            queryTree: {
+                id: "group_root_mixed_test",
+                type: "group",
+                combinator: "OR",
+                collapsed: false,
+                children: [
+                    {
+                        id: "group_demographic_filters",
+                        type: "group",
+                        combinator: "AND",
+                        collapsed: false,
+                        children: [
+                            {
+                                id: "rule_age_gt_18",
+                                type: "rule",
+                                field: "age",
+                                operator: "greaterThan",
+                                value: 18,
+                            },
+                            {
+                                id: "rule_country_nigeria",
+                                type: "rule",
+                                field: "country",
+                                operator: "equals",
+                                value: "Nigeria",
+                            },
+                        ],
+                    },
+                    {
+                        id: "group_account_filters",
+                        type: "group",
+                        combinator: "AND",
+                        collapsed: false,
+                        children: [
+                            {
+                                id: "rule_status_active",
+                                type: "rule",
+                                field: "status",
+                                operator: "equals",
+                                value: "active",
+                            },
+                            {
+                                id: "rule_purchases_gt_10",
+                                type: "rule",
+                                field: "purchases",
+                                operator: "greaterThan",
+                                value: 10,
+                            },
+                            {
+                                id: "group_verified_recent",
+                                type: "group",
+                                combinator: "AND",
+                                collapsed: false,
+                                children: [
+                                    {
+                                        id: "rule_is_verified",
+                                        type: "rule",
+                                        field: "isVerified",
+                                        operator: "equals",
+                                        value: true,
+                                    },
+                                    {
+                                        id: "rule_created_after",
+                                        type: "rule",
+                                        field: "createdAt",
+                                        operator: "after",
+                                        value: "2025-01-01",
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    {
+                        id: "group_search_filters",
+                        type: "group",
+                        combinator: "OR",
+                        collapsed: false,
+                        children: [
+                            {
+                                id: "rule_name_starts_a",
+                                type: "rule",
+                                field: "name",
+                                operator: "startsWith",
+                                value: "A",
+                            },
+                            {
+                                id: "rule_email_contains_example",
+                                type: "rule",
+                                field: "email",
+                                operator: "contains",
+                                value: "example",
+                            },
+                        ],
+                    },
+                ],
+            },
+        };
+
+        await importQueryJson(page, mixedGroupQuery);
+
+        await expect(page.getByText(/4 nested groups/i).first()).toBeVisible();
+        await expect(page.getByText(/8 rules/i).first()).toBeVisible();
+        await expect(page.getByText(/Query is valid/i)).toBeVisible();
+
+        await expect(page.getByText(/\$or/i).first()).toBeVisible();
+        await expect(page.getByText(/\$and/i).first()).toBeVisible();
+
+        await expect(page.getByRole("button", { name: /Run Query/i })).toBeEnabled();
+
+        await page.getByRole("button", { name: /Run Query/i }).click();
+
+        await expect(
+            page.getByText("Showing records from the Users mock dataset."),
+        ).toBeVisible();
+
+        await expect(page.getByText(/results/i).first()).toBeVisible();
     });
 });
