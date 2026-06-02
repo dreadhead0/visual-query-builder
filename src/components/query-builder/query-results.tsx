@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { ArrowDownUp, ChevronLeft, ChevronRight } from "lucide-react";
 
 import {
@@ -21,10 +21,11 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 250;
 const ROW_HEIGHT = 48;
 const VIRTUAL_CONTAINER_HEIGHT = 320;
 const OVERSCAN = 4;
+const VIRTUALIZATION_BADGE_THRESHOLD = 100;
 
 type QueryResultsProps = {
     runId: number;
@@ -54,10 +55,14 @@ export function QueryResults({
     executedQueryTree,
     executedSchema,
 }: QueryResultsProps) {
+    const tableViewportRef = useRef<HTMLDivElement | null>(null);
     const [sortField, setSortField] = useState<string | null>(null);
     const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
     const [page, setPage] = useState(1);
-    const [scrollTop, setScrollTop] = useState(0);
+    const [scrollState, setScrollState] = useState({
+        key: "",
+        top: 0,
+    });
 
     const dataset = executedSchema
         ? getMockDatasetBySchemaId(executedSchema.id)
@@ -90,6 +95,16 @@ export function QueryResults({
     const totalPages = Math.max(1, Math.ceil(execution.total / PAGE_SIZE));
     const safePage = Math.min(page, totalPages);
 
+    const viewportKey = [
+        runId,
+        safePage,
+        sortField ?? "none",
+        sortDirection,
+        execution.total,
+    ].join(":");
+
+    const scrollTop = scrollState.key === viewportKey ? scrollState.top : 0;
+
     const paginatedRecords = execution.records.slice(
         (safePage - 1) * PAGE_SIZE,
         safePage * PAGE_SIZE,
@@ -107,27 +122,61 @@ export function QueryResults({
     );
     const virtualRecords = paginatedRecords.slice(startIndex, endIndex);
     const topSpacerHeight = startIndex * ROW_HEIGHT;
-    const bottomSpacerHeight = Math.max(0, (virtualRowCount - endIndex) * ROW_HEIGHT);
+    const bottomSpacerHeight = Math.max(
+        0,
+        (virtualRowCount - endIndex) * ROW_HEIGHT,
+    );
+    const shouldShowVirtualizationBadge =
+        execution.total > VIRTUALIZATION_BADGE_THRESHOLD;
+    const renderedRowCount = virtualRecords.length;
 
     function handleSortFieldChange(fieldName: string) {
         setSortField(fieldName);
         setPage(1);
-        setScrollTop(0);
+        setScrollState({
+            key: viewportKey,
+            top: 0,
+        });
+
+        if (tableViewportRef.current) {
+            tableViewportRef.current.scrollTop = 0;
+        }
     }
 
     function handleToggleSortDirection() {
         setSortDirection((current) => (current === "asc" ? "desc" : "asc"));
-        setScrollTop(0);
+        setScrollState({
+            key: viewportKey,
+            top: 0,
+        });
+
+        if (tableViewportRef.current) {
+            tableViewportRef.current.scrollTop = 0;
+        }
     }
 
     function handlePreviousPage() {
         setPage((current) => Math.max(1, current - 1));
-        setScrollTop(0);
+        setScrollState({
+            key: viewportKey,
+            top: 0,
+        });
+
+        if (tableViewportRef.current) {
+            tableViewportRef.current.scrollTop = 0;
+        }
     }
 
     function handleNextPage() {
         setPage((current) => Math.min(totalPages, current + 1));
-        setScrollTop(0);
+        setScrollState({
+            key: viewportKey,
+            top: 0,
+        });
+
+        if (tableViewportRef.current) {
+            tableViewportRef.current.scrollTop = 0;
+        }
     }
 
     if (isRunning) {
@@ -168,8 +217,15 @@ export function QueryResults({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="outline" className="accent-primary-soft">{execution.total} results</Badge>
-                    <Badge variant="outline" className="state-valid">Virtualized rows</Badge>
+                    <Badge variant="outline" className="accent-primary-soft">
+                        {execution.total} results
+                    </Badge>
+
+                    {shouldShowVirtualizationBadge && (
+                        <Badge variant="outline" className="state-valid">
+                            Virtualized rows · rendering {renderedRowCount} mounted rows
+                        </Badge>
+                    )}
 
                     <Select
                         name="results-sort-field"
@@ -209,12 +265,17 @@ export function QueryResults({
             ) : (
                 <>
                     <div className="liquid-readable mt-4 overflow-hidden rounded-2xl">
-                        <div
-                            className="max-h-[320px] overflow-auto"
-                            onScroll={(event) =>
-                                setScrollTop(event.currentTarget.scrollTop)
-                            }
-                        >
+                            <div
+                                key={viewportKey}
+                                ref={tableViewportRef}
+                                className="h-[320px] overflow-auto"
+                                onScroll={(event) =>
+                                    setScrollState({
+                                        key: viewportKey,
+                                        top: event.currentTarget.scrollTop,
+                                    })
+                                }
+                            >
                             <table className="w-full min-w-[720px] table-fixed text-left text-sm">
                                 <colgroup>
                                     {executedSchema?.fields.map((field) => (
@@ -287,6 +348,9 @@ export function QueryResults({
                         <p className="text-sm text-muted-foreground">
                             Page {safePage} of {totalPages} · Showing{" "}
                             {paginatedRecords.length} records on this page
+                            {shouldShowVirtualizationBadge
+                                ? ` · ${renderedRowCount} rows mounted`
+                                : ""}
                         </p>
 
                         <div className="flex gap-2">
