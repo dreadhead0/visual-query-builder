@@ -281,18 +281,20 @@ function createRecords(
     return [...baseRecords, ...generatedRecords];
 }
 
+const DEMO_RECORD_COUNT = 5000;
+
 export const MOCK_DATASETS: MockDataset[] = [
     {
         schemaId: "users",
-        records: createRecords(baseUserRecords, 128, createUserRecord),
+        records: createRecords(baseUserRecords, DEMO_RECORD_COUNT, createUserRecord),
     },
     {
         schemaId: "orders",
-        records: createRecords(baseOrderRecords, 128, createOrderRecord),
+        records: createRecords(baseOrderRecords, DEMO_RECORD_COUNT, createOrderRecord),
     },
     {
         schemaId: "products",
-        records: createRecords(baseProductRecords, 128, createProductRecord),
+        records: createRecords(baseProductRecords, DEMO_RECORD_COUNT, createProductRecord),
     },
 ];
 
