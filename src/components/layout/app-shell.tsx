@@ -201,12 +201,12 @@ export function AppShell() {
                 <div className="grid gap-4 py-5">
                     <DataSourceBar onSchemaChange={handleSchemaChange} />
 
-                    <div className="grid min-h-[620px] gap-4 2xl:grid-cols-[minmax(0,1fr)_420px]">
+                    <div className="grid min-h-[620px] gap-4 xl:grid-cols-[minmax(0,1fr)_365px] 2xl:grid-cols-[minmax(0,1fr)_385px]">
                         <section className="liquid-panel min-w-0 rounded-[1.75rem] p-4">
                             <QueryBuilder />
                         </section>
 
-                        <aside className="liquid-panel space-y-4 rounded-[1.75rem] p-4 2xl:sticky 2xl:top-4 2xl:self-start">
+                        <aside className="liquid-panel space-y-4 rounded-[1.75rem] p-3 xl:sticky xl:top-4 xl:self-start 2xl:p-4">
                             <QueryPreview />
                             <ValidationPanel />
                         </aside>

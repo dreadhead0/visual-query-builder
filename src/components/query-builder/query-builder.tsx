@@ -176,7 +176,7 @@ export function QueryBuilder() {
                 </div>
             </div>
 
-            <div className="grid min-h-[560px] min-w-0 gap-4 2xl:grid-cols-[minmax(560px,1.25fr)_minmax(420px,0.75fr)]">
+            <div className="grid min-h-[560px] min-w-0 gap-4 xl:grid-cols-[minmax(470px,1.08fr)_minmax(330px,0.92fr)] 2xl:grid-cols-[minmax(520px,1.12fr)_minmax(360px,0.88fr)]">
                 <QueryStructureTree
                     queryTree={queryTree}
                     schema={activeSchema}

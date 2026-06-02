@@ -85,10 +85,10 @@ function QueryTreeItemComponent({
                         type="button"
                         data-testid="query-tree-rule"
                         aria-label={`Edit rule ${summary.fieldLabel}`}
-                        className={`min-w-[680px] rounded-xl px-2 py-1.5 text-left ${selectedClass}`}
+                        className={`min-w-[500px] rounded-xl px-2 py-1.5 text-left ${selectedClass}`}
                         onClick={() => onSelectNode(node.id)}
                     >
-                        <div className="grid min-w-[640px] grid-cols-[180px_150px_260px] items-center gap-4 text-sm">
+                        <div className="grid min-w-[460px] grid-cols-[150px_120px_180px] items-center gap-2 text-sm">
                             <span className="whitespace-nowrap font-medium">
                                 {summary.fieldLabel}
                             </span>
@@ -97,7 +97,13 @@ function QueryTreeItemComponent({
                                 {summary.operatorLabel}
                             </span>
 
-                            <span className={value === "No value" ? "whitespace-nowrap text-muted-foreground" : "whitespace-nowrap text-foreground"}>
+                            <span
+                                className={
+                                    value === "No value"
+                                        ? "whitespace-nowrap text-muted-foreground"
+                                        : "whitespace-nowrap text-foreground"
+                                }
+                            >
                                 {value}
                             </span>
                         </div>

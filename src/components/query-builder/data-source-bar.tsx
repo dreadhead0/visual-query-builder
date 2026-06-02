@@ -87,14 +87,20 @@ export function DataSourceBar({ onSchemaChange }: DataSourceBarProps) {
                         </Badge>
                     </div>
 
-                    <div className="flex gap-2 overflow-x-auto pb-1">
+                    <div className="flex min-w-0 flex-wrap gap-2">
                         {activeSchema.fields.map((field) => (
                             <div
                                 key={field.name}
-                                className={`liquid-readable ${getFieldTypeClass(field.type)} flex shrink-0 items-center gap-2 rounded-2xl px-3 py-2 text-sm`}
+                                className={`liquid-readable ${getFieldTypeClass(field.type)} flex min-w-0 items-center gap-2 rounded-2xl px-3 py-2 text-sm`}
                             >
-                                <span className="font-medium">{field.label}</span>
-                                <Badge variant="outline" className={getFieldTypeClass(field.type)}>
+                                <span className="whitespace-nowrap font-medium">
+                                    {field.label}
+                                </span>
+
+                                <Badge
+                                    variant="outline"
+                                    className={`shrink-0 ${getFieldTypeClass(field.type)}`}
+                                >
                                     {field.type}
                                 </Badge>
                             </div>
