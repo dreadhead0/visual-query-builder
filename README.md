@@ -10,8 +10,6 @@ QueryNest allows users to visually construct complex database/API-style filters 
 
 **Production URL:** https://visual-query-builder-2tr8.vercel.app/
 
-**Demo Video:** Add demo video link here
-
 ---
 
 ## Project Overview
@@ -640,7 +638,7 @@ The workflow follows the Stage 8 requirement:
 Clone the repository:
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/dreadhead0/visual-query-builder
 cd visual-query-builder
 ```
 
@@ -812,4 +810,4 @@ Since the app simulates execution locally, generated queries are used for previe
 
 ## Author
 
-Built by Precious Odion for Frontend Wizards Stage 8 — One Last Dance: Visual Query Builder with Next.js.
+Built by dreadhead : Visual Query Builder with Next.js.
